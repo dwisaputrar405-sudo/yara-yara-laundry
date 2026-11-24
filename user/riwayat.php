@@ -1,4 +1,5 @@
 <?php
+require __DIR__ . '/includes/guard.php';
 $activeNav = 'riwayat';
 ?>
 <!DOCTYPE html>

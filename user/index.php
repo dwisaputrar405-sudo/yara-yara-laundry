@@ -1,4 +1,5 @@
 <?php
+require __DIR__ . '/includes/guard.php';
 $activeNav = 'beranda';
 ?>
 <!DOCTYPE html>

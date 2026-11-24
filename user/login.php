@@ -103,9 +103,34 @@
             toggleBtn.textContent = isPassword ? '[SEMBUNYIKAN]' : '[TAMPILKAN]';
         });
 
-        document.getElementById('customer-login-form').addEventListener('submit', (e) => {
+        document.getElementById('customer-login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            window.location.href = 'index.php';
+            const btn = e.target.querySelector('button[type="submit"]');
+            const origText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '[MEMPROSES...]';
+
+            try {
+                const res = await fetch('../api/user.php?route=auth&action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phone: document.getElementById('phone-number').value,
+                        password: passwordInput.value
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    alert(data.error || 'Gagal masuk ke sistem.');
+                    return;
+                }
+                window.location.href = 'index.php';
+            } catch (err) {
+                alert('Koneksi ke server gagal. Pastikan Apache & MySQL XAMPP aktif.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = origText;
+            }
         });
     </script>
 </body>
