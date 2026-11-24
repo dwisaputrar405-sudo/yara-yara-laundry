@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/includes/guard.php';
 $activeNav = 'pesan';
+$cust = $_SESSION['customer'];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -49,7 +50,6 @@ $activeNav = 'pesan';
     <div class="max-w-md mx-auto min-h-screen flex flex-col bg-[#f4f5f7] border-x border-slate-200 relative">
         <?php require __DIR__ . '/includes/header.php'; ?>
 
-        <!-- BEGIN: MainContent -->
         <main class="flex-1 w-full px-4 pt-4 pb-6 space-y-4">
             <nav aria-label="Navigasi Kembali">
                 <a class="inline-flex items-center gap-1.5 text-xs font-bold text-[#181c28] hover:underline" href="pesan.php">
@@ -58,7 +58,6 @@ $activeNav = 'pesan';
                 </a>
             </nav>
 
-            <!-- BEGIN: PageTitleSection -->
             <section class="brutalist-card p-4 space-y-2" data-purpose="page-title-block">
                 <div class="inline-block bg-slate-200 px-2 py-0.5 text-[10px] font-bold tracking-wide text-[#181c28]">
                     [STATUS: DRAF SIAP DIKONFIRMASI]
@@ -70,9 +69,7 @@ $activeNav = 'pesan';
                     Periksa kembali rincian cucian Anda sebelum diterbitkan ke sistem antrean.
                 </p>
             </section>
-            <!-- END: PageTitleSection -->
 
-            <!-- BEGIN: TicketCodeSection -->
             <section class="brutalist-card p-4 space-y-2" data-purpose="ticket-identification">
                 <div class="flex items-start justify-between gap-2">
                     <span class="text-[10px] font-medium text-slate-500 uppercase tracking-wider leading-tight">
@@ -82,30 +79,26 @@ $activeNav = 'pesan';
                         MENUNGGU KONFIRMASI
                     </span>
                 </div>
-                <div class="text-2xl font-extrabold tracking-tight text-[#181c28]">
-                    #YYL-8922
+                <div id="draft-ticket-code" class="text-2xl font-extrabold tracking-tight text-[#181c28]">
+                    #YYL-DRAFT
                 </div>
             </section>
-            <!-- END: TicketCodeSection -->
 
-            <!-- BEGIN: CustomerAndOutletSection -->
             <section class="brutalist-card p-3 space-y-2.5" data-purpose="customer-outlet-info">
                 <div class="brutalist-header-strip px-2.5 py-1.5 text-xs font-bold text-[#181c28]">
                     [1. DATA PEMESAN &amp; OUTLET]
                 </div>
                 <div class="brutalist-inset p-2.5 space-y-1">
                     <div class="text-[10px] text-slate-500 uppercase">NAMA PELANGGAN:</div>
-                    <div class="text-xs font-bold text-[#181c28]">Budi Santoso</div>
-                    <div class="text-xs font-semibold text-slate-700">+62 812-3456-7890</div>
+                    <div class="text-xs font-bold text-[#181c28]"><?= htmlspecialchars($cust['name']) ?></div>
+                    <div class="text-xs font-semibold text-slate-700"><?= htmlspecialchars($cust['phone']) ?></div>
                 </div>
                 <div class="brutalist-inset p-2.5 space-y-1">
                     <div class="text-[10px] text-slate-500 uppercase">OUTLET TUJUAN:</div>
                     <div class="text-xs font-bold text-[#181c28]">Gerai Pusat Yara Yara</div>
                 </div>
             </section>
-            <!-- END: CustomerAndOutletSection -->
 
-            <!-- BEGIN: ServiceDetailsSection -->
             <section class="brutalist-card p-3 space-y-2.5" data-purpose="service-specification">
                 <div class="brutalist-header-strip px-2.5 py-1.5 text-xs font-bold text-[#181c28]">
                     [2. RINCIAN LAYANAN &amp; BIAYA]
@@ -113,15 +106,15 @@ $activeNav = 'pesan';
                 <div class="space-y-1.5 text-xs">
                     <div class="brutalist-inset px-2.5 py-2 flex justify-between items-center gap-2">
                         <span class="text-[11px] text-slate-600">PAKET LAYANAN</span>
-                        <span id="conf-service" class="font-bold text-[#181c28] text-right">Cuci Komplit Reguler</span>
+                        <span id="conf-service" class="font-bold text-[#181c28] text-right">-</span>
                     </div>
                     <div class="brutalist-inset px-2.5 py-2 flex justify-between items-center gap-2">
                         <span class="text-[11px] text-slate-600">ESTIMASI BEBAN</span>
-                        <span id="conf-weight" class="font-bold text-[#181c28] text-right">4.0 Kg (@ Rp 8.000)</span>
+                        <span id="conf-weight" class="font-bold text-[#181c28] text-right">-</span>
                     </div>
                     <div class="brutalist-inset px-2.5 py-2 flex justify-between items-center gap-2">
                         <span class="text-[11px] text-slate-600">SERAH TERIMA</span>
-                        <span id="conf-method" class="font-bold text-[#181c28] text-right">Ambil Sendiri</span>
+                        <span id="conf-method" class="font-bold text-[#181c28] text-right">-</span>
                     </div>
                     <div id="conf-address-row" class="hidden brutalist-inset px-2.5 py-2 flex justify-between items-start gap-2">
                         <span class="text-[11px] text-slate-600 shrink-0">ALAMAT KURIR</span>
@@ -130,26 +123,22 @@ $activeNav = 'pesan';
                 </div>
                 <div class="bg-slate-200 border border-slate-300 px-3 py-2.5 flex justify-between items-center">
                     <span class="text-xs font-bold text-[#181c28]">TOTAL ESTIMASI</span>
-                    <span id="conf-total" class="text-base font-extrabold text-[#181c28]">RP 32.000</span>
+                    <span id="conf-total" class="text-base font-extrabold text-[#181c28]">RP 0</span>
                 </div>
             </section>
-            <!-- END: ServiceDetailsSection -->
 
-            <!-- BEGIN: ShortScaleWarning -->
             <section class="bg-slate-200/80 border border-slate-300 p-3 flex items-start gap-2.5" data-purpose="scale-warning-notice">
                 <svg class="w-4 h-4 text-[#181c28] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round"></path>
                 </svg>
                 <p class="text-[11px] text-[#181c28] leading-snug">
-                    <strong class="font-bold">[!] CATATAN TIMBANGAN:</strong> Berat <span id="conf-warn-weight">4.0 Kg</span> adalah estimasi awal dan akan ditimbang ulang resmi oleh kasir saat serah terima di outlet.
+                    <strong class="font-bold">[!] CATATAN TIMBANGAN:</strong> Berat <span id="conf-warn-weight">-</span> adalah estimasi awal dan akan ditimbang ulang resmi oleh kasir saat serah terima di outlet.
                 </p>
             </section>
-            <!-- END: ShortScaleWarning -->
 
-            <!-- BEGIN: ActionButtons -->
             <section class="space-y-2.5 pt-1" data-purpose="confirmation-actions">
                 <button id="btn-publish-ticket" class="w-full bg-[#181c28] hover:bg-slate-800 active:bg-black text-white font-bold text-xs tracking-wider py-3.5 px-4 border border-[#181c28] transition-colors" type="button">
-                    [KONFIRMASI &amp; TERBITKAN TIKET #YYL-8922]
+                    [KONFIRMASI &amp; TERBITKAN TIKET PESANAN]
                 </button>
                 <a href="pesan.php" class="w-full bg-white hover:bg-slate-50 text-[#181c28] font-bold text-xs tracking-wider py-3 px-4 border border-slate-300 flex items-center justify-center gap-2 transition-colors">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -158,13 +147,10 @@ $activeNav = 'pesan';
                     <span>[UBAH RINCIAN PESANAN]</span>
                 </a>
             </section>
-            <!-- END: ActionButtons -->
         </main>
-        <!-- END: MainContent -->
 
         <?php require __DIR__ . '/includes/bottom-nav.php'; ?>
 
-        <!-- BEGIN: ModalOverlay (Pesanan Berhasil Dibuat - Muncul saat tombol Konfirmasi ditekan) -->
         <div id="modal-success-ticket" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center p-4">
             <section class="w-full max-w-[340px] bg-white border-2 border-[#181c28] shadow-brutal p-5 relative" data-purpose="order-confirmation-modal">
                 <a href="index.php" aria-label="Tutup dialog" class="absolute top-2.5 right-2.5 w-6 h-6 flex items-center justify-center text-xs font-bold text-slate-500 hover:text-black border border-slate-300 hover:border-black bg-white transition-colors">
@@ -192,23 +178,23 @@ $activeNav = 'pesan';
                     <div class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">
                         NO. TIKET / RESI PEMESANAN
                     </div>
-                    <div class="text-xl font-extrabold text-[#181c28] tracking-wide mt-1">
-                        #YYL-8922
+                    <div id="modal-order-code" class="text-xl font-extrabold text-[#181c28] tracking-wide mt-1">
+                        #YYL-0000
                     </div>
                 </div>
 
                 <div class="mt-3.5 border-t border-b border-slate-200 py-2.5 space-y-1.5 text-[11px]">
                     <div class="flex justify-between items-baseline">
                         <span class="text-slate-500">Layanan:</span>
-                        <span id="modal-service" class="font-bold text-slate-800 text-right">Cuci Komplit Reguler</span>
+                        <span id="modal-service" class="font-bold text-slate-800 text-right">-</span>
                     </div>
                     <div class="flex justify-between items-baseline">
                         <span class="text-slate-500">Estimasi Beban:</span>
-                        <span id="modal-weight" class="font-bold text-slate-800 text-right">4.0 Kg</span>
+                        <span id="modal-weight" class="font-bold text-slate-800 text-right">-</span>
                     </div>
                     <div class="flex justify-between items-baseline pt-1 border-t border-slate-100">
                         <span class="text-[#181c28] font-bold">Total Estimasi:</span>
-                        <span id="modal-total" class="font-extrabold text-[#181c28] text-right">Rp 32.000</span>
+                        <span id="modal-total" class="font-extrabold text-[#181c28] text-right">Rp 0</span>
                     </div>
                 </div>
 
@@ -217,7 +203,7 @@ $activeNav = 'pesan';
                 </div>
 
                 <div class="mt-4 flex flex-col gap-2">
-                    <a href="lacak.php" class="w-full bg-[#181c28] hover:bg-black text-white text-[11px] font-bold py-2.5 px-3 uppercase tracking-wider text-center transition-all border border-[#181c28] shadow-brutal-sm flex items-center justify-center gap-1.5">
+                    <a id="modal-track-link" href="lacak.php" class="w-full bg-[#181c28] hover:bg-black text-white text-[11px] font-bold py-2.5 px-3 uppercase tracking-wider text-center transition-all border border-[#181c28] shadow-brutal-sm flex items-center justify-center gap-1.5">
                         <span>[ LACAK PROSES PESANAN</span>
                         <span>→ ]</span>
                     </a>
@@ -227,35 +213,69 @@ $activeNav = 'pesan';
                 </div>
             </section>
         </div>
-        <!-- END: ModalOverlay -->
     </div>
 
     <script>
         (function () {
             const raw = sessionStorage.getItem('yaraDraftOrder');
-            if (raw) {
-                const d = JSON.parse(raw);
-                const weightLabel = `${d.weightText} ${d.unit === 'KG' ? 'Kg' : 'Pcs'}`;
-                const totalRp = 'Rp ' + Number(d.total).toLocaleString('id-ID');
+            if (!raw) {
+                window.location.href = 'pesan.php';
+                return;
+            }
+            const d = JSON.parse(raw);
+            const weightLabel = `${d.weightText} ${d.unit === 'KG' ? 'Kg' : 'Pcs'}`;
+            const totalRp = 'Rp ' + Number(d.total).toLocaleString('id-ID');
 
-                document.getElementById('conf-service').textContent = d.serviceName;
-                document.getElementById('conf-weight').textContent = `${weightLabel} (@ Rp ${Number(d.unitPrice).toLocaleString('id-ID')})`;
-                document.getElementById('conf-method').textContent = d.methodLabel;
-                document.getElementById('conf-total').textContent = totalRp.toUpperCase();
-                document.getElementById('conf-warn-weight').textContent = weightLabel;
+            document.getElementById('conf-service').textContent = d.serviceName;
+            document.getElementById('conf-weight').textContent = `${weightLabel} (@ Rp ${Number(d.unitPrice).toLocaleString('id-ID')})`;
+            document.getElementById('conf-method').textContent = d.methodLabel;
+            document.getElementById('conf-total').textContent = totalRp.toUpperCase();
+            document.getElementById('conf-warn-weight').textContent = weightLabel;
 
-                if (d.deliveryFee > 0 && d.address) {
-                    document.getElementById('conf-address-row').classList.remove('hidden');
-                    document.getElementById('conf-address').textContent = d.address;
-                }
-
-                document.getElementById('modal-service').textContent = d.serviceName;
-                document.getElementById('modal-weight').textContent = weightLabel;
-                document.getElementById('modal-total').textContent = totalRp;
+            if (d.deliveryFee > 0 && d.address) {
+                document.getElementById('conf-address-row').classList.remove('hidden');
+                document.getElementById('conf-address').textContent = d.address;
             }
 
-            document.getElementById('btn-publish-ticket').addEventListener('click', () => {
-                document.getElementById('modal-success-ticket').classList.remove('hidden');
+            document.getElementById('modal-service').textContent = d.serviceName;
+            document.getElementById('modal-weight').textContent = weightLabel;
+            document.getElementById('modal-total').textContent = totalRp;
+
+            const btnPublish = document.getElementById('btn-publish-ticket');
+            btnPublish.addEventListener('click', async () => {
+                btnPublish.disabled = true;
+                btnPublish.textContent = '[MENERBITKAN TIKET KE SISTEM...]';
+
+                try {
+                    const res = await fetch('../api/user.php?route=orders&action=create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            service_id: d.serviceId,
+                            weight_qty: d.weightQty,
+                            delivery_type: d.deliveryType,
+                            pickup_address: d.address,
+                            notes: d.note
+                        })
+                    });
+                    const data = await res.json();
+                    if (!res.ok || !data.success) {
+                        alert(data.error || 'Gagal membuat pesanan.');
+                        btnPublish.disabled = false;
+                        btnPublish.textContent = '[KONFIRMASI & TERBITKAN TIKET PESANAN]';
+                        return;
+                    }
+
+                    sessionStorage.removeItem('yaraDraftOrder');
+                    document.getElementById('draft-ticket-code').textContent = data.order.order_code;
+                    document.getElementById('modal-order-code').textContent = data.order.order_code;
+                    document.getElementById('modal-track-link').href = 'lacak.php?code=' + encodeURIComponent(data.order.order_code);
+                    document.getElementById('modal-success-ticket').classList.remove('hidden');
+                } catch (err) {
+                    alert('Koneksi ke server gagal.');
+                    btnPublish.disabled = false;
+                    btnPublish.textContent = '[KONFIRMASI & TERBITKAN TIKET PESANAN]';
+                }
             });
         })();
     </script>

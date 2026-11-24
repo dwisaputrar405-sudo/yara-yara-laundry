@@ -29,6 +29,9 @@ function requireCustomer()
 }
 
 try {
+    // =========================================================
+    // 1. AUTENTIKASI PELANGGAN
+    // =========================================================
     if ($route === 'auth') {
         if ($action === 'me') {
             jsonOut(['authenticated' => true, 'customer' => requireCustomer()]);
@@ -43,7 +46,7 @@ try {
             jsonOut(['success' => true]);
         }
 
-        if ($method === 'POST' && $action === 'login') {
+        if ($method === 'POST' and $action === 'login') {
             $in    = jsonIn();
             $phone = normalizePhone($in['phone'] ?? '');
             $pass  = $in['password'] ?? '';
@@ -52,7 +55,7 @@ try {
             $stmt->execute([$phone]);
             $cust = $stmt->fetch();
 
-            if (!$cust || empty($cust['password_hash']) || !password_verify($pass, $cust['password_hash'])) {
+            if (!$cust or empty($cust['password_hash']) or !password_verify($pass, $cust['password_hash'])) {
                 jsonOut(['error' => 'Nomor telepon atau kata sandi salah.'], 401);
             }
 
@@ -66,7 +69,7 @@ try {
             jsonOut(['success' => true, 'customer' => $_SESSION['customer']]);
         }
 
-        if ($method === 'POST' && $action === 'request_otp') {
+        if ($method === 'POST' and $action === 'request_otp') {
             $in      = jsonIn();
             $phone   = normalizePhone($in['phone'] ?? '');
             $purpose = ($in['purpose'] ?? 'REGISTRASI') === 'RESET_PASSWORD' ? 'RESET_PASSWORD' : 'REGISTRASI';
@@ -79,10 +82,10 @@ try {
             $stmt->execute([$phone]);
             $existing = $stmt->fetch();
 
-            if ($purpose === 'REGISTRASI' && $existing && !empty($existing['password_hash'])) {
+            if ($purpose === 'REGISTRASI' and $existing and !empty($existing['password_hash'])) {
                 jsonOut(['error' => 'Nomor WhatsApp sudah terdaftar. Silakan login.'], 400);
             }
-            if ($purpose === 'RESET_PASSWORD' && (!$existing || empty($existing['password_hash']))) {
+            if ($purpose === 'RESET_PASSWORD' and (!$existing or empty($existing['password_hash']))) {
                 jsonOut(['error' => 'Nomor WhatsApp belum terdaftar sebagai akun aktif.'], 404);
             }
 
@@ -107,7 +110,7 @@ try {
             ]);
         }
 
-        if ($method === 'POST' && $action === 'verify_otp') {
+        if ($method === 'POST' and $action === 'verify_otp') {
             $in      = jsonIn();
             $phone   = normalizePhone($in['phone'] ?? ($_SESSION['otp_pending']['phone'] ?? ''));
             $purpose = ($in['purpose'] ?? ($_SESSION['otp_pending']['purpose'] ?? 'REGISTRASI')) === 'RESET_PASSWORD' ? 'RESET_PASSWORD' : 'REGISTRASI';
@@ -117,7 +120,7 @@ try {
             $stmt->execute([$phone, $purpose]);
             $otpRow = $stmt->fetch();
 
-            if (!$otpRow || strtotime($otpRow['expires_at']) < time()) {
+            if (!$otpRow or strtotime($otpRow['expires_at']) < time()) {
                 jsonOut(['error' => 'Kode OTP tidak valid atau sudah kedaluwarsa.'], 400);
             }
             if ((int)$otpRow['attempts'] >= 5) {
@@ -170,11 +173,14 @@ try {
         }
     }
 
+    // =========================================================
+    // 2. PROFIL PELANGGAN
+    // =========================================================
     if ($route === 'profile') {
         $cust = requireCustomer();
         $in   = jsonIn();
 
-        if ($method === 'PUT' && $action === 'update') {
+        if ($method === 'PUT' and $action === 'update') {
             $name    = trim($in['name'] ?? $cust['name']);
             $phone   = normalizePhone($in['phone'] ?? $cust['phone']);
             $address = array_key_exists('address', $in) ? trim((string)$in['address']) : $cust['address'];
@@ -188,7 +194,7 @@ try {
             jsonOut(['success' => true, 'customer' => $_SESSION['customer']]);
         }
 
-        if ($method === 'PUT' && $action === 'change_password') {
+        if ($method === 'PUT' and $action === 'change_password') {
             $newPass = $in['new_password'] ?? '';
             if (strlen($newPass) < 6) {
                 jsonOut(['error' => 'Kata sandi baru minimal 6 karakter.'], 400);
@@ -199,8 +205,93 @@ try {
         }
     }
 
+    // =========================================================
+    // 3. PESANAN PELANGGAN (SESUAI SKEMA yara_laundry_3.sql)
+    // =========================================================
+    if ($route === 'orders') {
+        $cust = requireCustomer();
+
+        if ($method === 'POST' and $action === 'create') {
+            $in        = jsonIn();
+            $serviceId = (int)($in['service_id'] ?? 0);
+            $weight    = (float)($in['weight_qty'] ?? 0);
+            $delivery  = ($in['delivery_type'] ?? 'DROP_OFF') === 'ANTAR_JEMPUT' ? 'ANTAR_JEMPUT' : 'DROP_OFF';
+            $address   = trim((string)($in['pickup_address'] ?? ''));
+            $note      = trim((string)($in['notes'] ?? ''));
+
+            if ($serviceId <= 0 or $weight <= 0) {
+                jsonOut(['error' => 'Layanan dan berat/jumlah cucian wajib diisi.'], 400);
+            }
+
+            $stmt = $pdo->prepare("SELECT * FROM services WHERE id = ? LIMIT 1");
+            $stmt->execute([$serviceId]);
+            $srv = $stmt->fetch();
+            if (!$srv) {
+                jsonOut(['error' => 'Layanan tidak ditemukan.'], 404);
+            }
+
+            $feeStmt = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'delivery_fee' LIMIT 1");
+            $delivFee = $delivery === 'ANTAR_JEMPUT' ? (int)($feeStmt->fetchColumn() ?: 5000) : 0;
+
+            $subtotal   = (int)round($weight * (int)$srv['price_per_unit']);
+            $totalPrice = $subtotal + $delivFee;
+
+            $statusStep = $delivery === 'ANTAR_JEMPUT' ? 0 : 1;
+            $statusNote = $delivery === 'ANTAR_JEMPUT' ? 'Menunggu Kurir Jemput' : 'Menunggu Timbang Ulang';
+            $timeLabel  = 'Hari ini, ' . date('H:i');
+
+            $pdo->beginTransaction();
+
+            $maxNum = (int)$pdo->query("SELECT COALESCE(MAX(CAST(SUBSTRING(receipt_no, 6) AS UNSIGNED)), 8925) FROM orders")->fetchColumn();
+            $receiptNo = '#YYL-' . ($maxNum + 1);
+
+            $ins = $pdo->prepare("INSERT INTO orders
+                (receipt_no, customer_id, service_id, delivery_type, pickup_address, delivery_fee, weight, is_estimated_weight, status_step, status_note, payment_status, total_price, notes, time_label)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, 'BELUM', ?, ?, ?)");
+            $ins->execute([
+                $receiptNo,
+                $cust['id'],
+                $srv['id'],
+                $delivery,
+                $delivery === 'ANTAR_JEMPUT' ? $address : null,
+                $delivFee,
+                $weight,
+                $statusStep,
+                $statusNote,
+                $totalPrice,
+                $note,
+                $timeLabel
+            ]);
+            $orderId = (int)$pdo->lastInsertId();
+
+            $logText = "Pesanan " . ($delivery === 'ANTAR_JEMPUT' ? 'Antar-Jemput' : 'Drop-Off') . " {$receiptNo} masuk dari aplikasi pelanggan (Estimasi {$weight} {$srv['unit']})";
+            $pdo->prepare("INSERT INTO order_logs (order_id, action, actor) VALUES (?, ?, ?)")
+                ->execute([$orderId, $logText, 'PELANGGAN (' . $cust['name'] . ')']);
+
+            if ($delivery === 'ANTAR_JEMPUT' and $address !== '') {
+                $pdo->prepare("UPDATE customers SET address = ? WHERE id = ?")->execute([$address, $cust['id']]);
+                $_SESSION['customer']['address'] = $address;
+            }
+
+            $pdo->commit();
+
+            jsonOut([
+                'success' => true,
+                'order'   => [
+                    'id'           => $orderId,
+                    'order_code'   => $receiptNo,
+                    'service_name' => $srv['name'],
+                    'unit_type'    => $srv['unit'],
+                    'weight_qty'   => $weight,
+                    'total_amount' => $totalPrice
+                ]
+            ]);
+        }
+    }
+
     jsonOut(['error' => 'Endpoint user tidak ditemukan.'], 404);
 } catch (PDOException $e) {
-    $msg = $e->getCode() === '23000' ? 'Nomor telepon sudah digunakan akun lain.' : $e->getMessage();
+    if ($pdo->inTransaction()) $pdo->rollBack();
+    $msg = $e->getCode() === '23000' ? 'Data bentrok atau nomor telepon sudah terdaftar.' : $e->getMessage();
     jsonOut(['error' => $msg], 400);
 }

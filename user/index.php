@@ -1,6 +1,50 @@
 <?php
 require __DIR__ . '/includes/guard.php';
+require_once __DIR__ . '/../config/database.php';
+
 $activeNav = 'beranda';
+$cust = $_SESSION['customer'];
+
+// Ambil pesanan aktif terbaru (status_step 0..6)
+$stmtActive = $pdo->prepare("
+    SELECT o.*, s.name AS service_name, s.unit
+    FROM orders o
+    JOIN services s ON s.id = o.service_id
+    WHERE o.customer_id = ? AND o.status_step < 7
+    ORDER BY o.id DESC
+    LIMIT 1
+");
+$stmtActive->execute([$cust['id']]);
+$activeOrder = $stmtActive->fetch();
+
+// Hitung total pesanan aktif
+$stmtCount = $pdo->prepare("SELECT COUNT(*) FROM orders WHERE customer_id = ? AND status_step < 7");
+$stmtCount->execute([$cust['id']]);
+$activeCount = (int)$stmtCount->fetchColumn();
+
+// Ambil 2 riwayat selesai terakhir (status_step = 7)
+$stmtHist = $pdo->prepare("
+    SELECT o.*, s.name AS service_name, s.unit
+    FROM orders o
+    JOIN services s ON s.id = o.service_id
+    WHERE o.customer_id = ? AND o.status_step = 7
+    ORDER BY o.id DESC
+    LIMIT 2
+");
+$stmtHist->execute([$cust['id']]);
+$recentOrders = $stmtHist->fetchAll();
+
+$stageNames = [
+    0 => 'MENUNGGU JEMPUT KURIR',
+    1 => 'MENUNGGU TIMBANG',
+    2 => 'ANTRIAN CUCI',
+    3 => 'SEDANG DICUCI',
+    4 => 'PENGERINGAN',
+    5 => 'SETRIKA & PACKING',
+    6 => 'SIAP DIAMBIL / DIANTAR',
+    7 => 'SELESAI'
+];
+$shortLabels = [1 => 'Timbang', 2 => 'Antre', 3 => 'Cuci', 4 => 'Kering', 5 => 'Setrika', 6 => 'Siap', 7 => 'Selesai'];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -27,99 +71,87 @@ $activeNav = 'beranda';
     <div class="max-w-md mx-auto min-h-screen flex flex-col bg-[#f4f5f7] border-x border-slate-200">
         <?php require __DIR__ . '/includes/header.php'; ?>
 
-        <!-- BEGIN: MainContent -->
         <main class="flex-1 px-4 pt-5 space-y-5" data-purpose="main-dashboard">
-            <!-- BEGIN: GreetingSection -->
             <section class="bg-white border border-slate-200 p-4" data-purpose="greeting-card">
                 <h1 class="text-xl font-bold tracking-tight text-[#181c28]">
-                    Halo, Budi Santoso
+                    Halo, <?= htmlspecialchars($cust['name']) ?>
                 </h1>
             </section>
-            <!-- END: GreetingSection -->
 
-            <!-- BEGIN: PrimaryAction -->
             <section data-purpose="create-order-action">
                 <a href="pesan.php" class="w-full bg-[#181c28] hover:bg-slate-800 active:bg-slate-900 text-white py-3.5 px-4 flex items-center justify-center gap-2.5 text-xs font-bold tracking-wider uppercase transition-colors">
                     <span class="inline-flex items-center justify-center w-4 h-4 border border-white text-[11px] leading-none">+</span>
                     <span>[+ BUAT PESANAN LAUNDRY BARU]</span>
                 </a>
             </section>
-            <!-- END: PrimaryAction -->
 
-            <!-- BEGIN: ActiveOrderSection -->
-            <section class="bg-white border border-slate-200 p-4 space-y-4" data-purpose="active-order-card">
-                <div class="bg-[#eef2f9] px-3 py-1.5 flex items-center justify-between text-[11px]">
-                    <span class="font-bold tracking-wider text-[#181c28]">PESANAN AKTIF (1)</span>
-                    <span class="text-slate-500">[LIVE TRACKING]</span>
-                </div>
+            <?php if ($activeOrder): ?>
+                <?php
+                $curStage = (int)$activeOrder['status_step'];
+                $qtyText = strtoupper($activeOrder['unit']) === 'KG'
+                    ? number_format((float)$activeOrder['weight'], 1) . ' Kg'
+                    : (int)$activeOrder['weight'] . ' Pcs';
+                ?>
+                <section class="bg-white border border-slate-200 p-4 space-y-4" data-purpose="active-order-card">
+                    <div class="bg-[#eef2f9] px-3 py-1.5 flex items-center justify-between text-[11px]">
+                        <span class="font-bold tracking-wider text-[#181c28]">PESANAN AKTIF (<?= $activeCount ?>)</span>
+                        <span class="text-slate-500">[LIVE TRACKING]</span>
+                    </div>
 
-                <div class="flex items-start justify-between gap-2">
-                    <div class="text-xl font-bold tracking-tight text-[#181c28] leading-tight">
-                        #YYL-8921
-                    </div>
-                    <div class="bg-[#eef2f9] px-2 py-1 text-[10px] font-bold text-[#181c28] text-right leading-snug">
-                        [SEDANG DICUCI - TAHAP 3 DARI 7]
-                    </div>
-                </div>
-
-                <div class="space-y-2.5 text-xs">
-                    <div>
-                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">LAYANAN:</div>
-                        <div class="font-bold text-[#181c28] text-sm">Cuci Komplit Reguler (4.8 Kg)</div>
-                    </div>
-                    <div>
-                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">ESTIMASI SELESAI:</div>
-                        <div class="text-[#181c28]">Rabu, 24 Okt 2024 - 17:00 WIB</div>
-                    </div>
-                </div>
-
-                <!-- Progress Bar 7 Tahap -->
-                <div class="bg-[#f4f5f7] p-3 border border-slate-200" data-purpose="workflow-progress">
-                    <div class="text-[10px] text-slate-500 mb-2">[PROGRES_WORKFLOW_TAHAP]</div>
-                    <div class="grid grid-cols-7 gap-1 text-center">
-                        <div>
-                            <div class="h-1.5 bg-[#181c28] mb-1"></div>
-                            <span class="text-[9px] font-medium text-[#181c28] block truncate">Terima</span>
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="text-xl font-bold tracking-tight text-[#181c28] leading-tight">
+                            <?= htmlspecialchars($activeOrder['receipt_no']) ?>
                         </div>
-                        <div>
-                            <div class="h-1.5 bg-[#181c28] mb-1"></div>
-                            <span class="text-[9px] font-medium text-[#181c28] block truncate">Timbang</span>
-                        </div>
-                        <div>
-                            <div class="h-1.5 bg-[#181c28] mb-1"></div>
-                            <span class="text-[9px] font-bold text-[#181c28] block truncate">[Cuci]</span>
-                        </div>
-                        <div>
-                            <div class="h-1.5 bg-slate-300 mb-1"></div>
-                            <span class="text-[9px] text-slate-400 block truncate">Kering</span>
-                        </div>
-                        <div>
-                            <div class="h-1.5 bg-slate-300 mb-1"></div>
-                            <span class="text-[9px] text-slate-400 block truncate">Setrika</span>
-                        </div>
-                        <div>
-                            <div class="h-1.5 bg-slate-300 mb-1"></div>
-                            <span class="text-[9px] text-slate-400 block truncate">Siap</span>
-                        </div>
-                        <div>
-                            <div class="h-1.5 bg-slate-300 mb-1"></div>
-                            <span class="text-[9px] text-slate-400 block truncate">Selesai</span>
+                        <div class="bg-[#eef2f9] px-2 py-1 text-[10px] font-bold text-[#181c28] text-right leading-snug">
+                            [<?= $stageNames[$curStage] ?? 'DIPROSES' ?> - TAHAP <?= max(1, $curStage) ?> DARI 7]
                         </div>
                     </div>
-                </div>
 
-                <a href="lacak.php" class="w-full bg-[#eef2f9] hover:bg-slate-200 text-[#181c28] py-2.5 px-3 flex items-center justify-between text-xs font-bold tracking-wider transition-colors">
-                    <span>[LACAK STATUS PESANAN]</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="9"></circle>
-                        <circle cx="12" cy="12" r="4"></circle>
-                        <circle cx="12" cy="12" fill="currentColor" r="1"></circle>
-                    </svg>
-                </a>
-            </section>
-            <!-- END: ActiveOrderSection -->
+                    <div class="space-y-2.5 text-xs">
+                        <div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">LAYANAN:</div>
+                            <div class="font-bold text-[#181c28] text-sm"><?= htmlspecialchars($activeOrder['service_name']) ?> (<?= $qtyText ?>)</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">STATUS OPERASIONAL:</div>
+                            <div class="text-[#181c28]"><?= htmlspecialchars($activeOrder['status_note']) ?> (<?= htmlspecialchars($activeOrder['time_label']) ?>)</div>
+                        </div>
+                    </div>
 
-            <!-- BEGIN: RecentHistorySection -->
+                    <div class="bg-[#f4f5f7] p-3 border border-slate-200" data-purpose="workflow-progress">
+                        <div class="text-[10px] text-slate-500 mb-2">[PROGRES_WORKFLOW_TAHAP]</div>
+                        <div class="grid grid-cols-7 gap-1 text-center">
+                            <?php for ($st = 1; $st <= 7; $st++): ?>
+                                <div>
+                                    <div class="h-1.5 <?= $st <= $curStage ? 'bg-[#181c28]' : 'bg-slate-300' ?> mb-1"></div>
+                                    <?php if ($st === $curStage): ?>
+                                        <span class="text-[9px] font-bold text-[#181c28] block truncate">[<?= $shortLabels[$st] ?>]</span>
+                                    <?php elseif ($st < $curStage): ?>
+                                        <span class="text-[9px] font-medium text-[#181c28] block truncate"><?= $shortLabels[$st] ?></span>
+                                    <?php else: ?>
+                                        <span class="text-[9px] text-slate-400 block truncate"><?= $shortLabels[$st] ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endfor; ?>
+                        </div>
+                    </div>
+
+                    <a href="lacak.php?code=<?= urlencode($activeOrder['receipt_no']) ?>" class="w-full bg-[#eef2f9] hover:bg-slate-200 text-[#181c28] py-2.5 px-3 flex items-center justify-between text-xs font-bold tracking-wider transition-colors">
+                        <span>[LACAK STATUS PESANAN]</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="9"></circle>
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <circle cx="12" cy="12" fill="currentColor" r="1"></circle>
+                        </svg>
+                    </a>
+                </section>
+            <?php else: ?>
+                <section class="bg-white border border-slate-200 p-4 text-center space-y-2">
+                    <div class="text-xs font-bold text-[#181c28]">[BELUM ADA PESANAN AKTIF]</div>
+                    <p class="text-[11px] text-slate-500">Klik tombol [+ BUAT PESANAN LAUNDRY BARU] di atas untuk mulai mencuci.</p>
+                </section>
+            <?php endif; ?>
+
             <section class="space-y-3" data-purpose="recent-history">
                 <div class="flex items-center justify-between">
                     <h2 class="text-xs font-bold tracking-wider text-[#181c28] uppercase">
@@ -130,45 +162,38 @@ $activeNav = 'beranda';
                     </a>
                 </div>
 
-                <article class="bg-white border border-slate-200 p-3.5 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-[#181c28]">#YYL-8804</span>
-                        <span class="bg-[#eef2f9] px-2 py-0.5 text-[10px] font-bold text-[#181c28]">[SELESAI]</span>
+                <?php if (empty($recentOrders)): ?>
+                    <div class="bg-white border border-slate-200 p-3.5 text-center text-[11px] text-slate-500">
+                        Belum ada riwayat pesanan yang selesai.
                     </div>
-                    <div class="text-xs text-[#181c28]">
-                        Cuci Bedcover Besar (1 Pcs)
-                    </div>
-                    <div class="flex items-center justify-between pt-1 text-[11px] text-slate-500 border-t border-slate-100">
-                        <div>
-                            <span>18 Okt 2024</span>
-                            <span class="mx-1">|</span>
-                            <span class="font-bold text-[#181c28]">Rp 35.000</span>
-                        </div>
-                        <a class="font-bold text-[#181c28] hover:underline" href="riwayat.php#YYL-8804">[LIHAT DETAIL]</a>
-                    </div>
-                </article>
-
-                <article class="bg-white border border-slate-200 p-3.5 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-[#181c28]">#YYL-8712</span>
-                        <span class="bg-[#eef2f9] px-2 py-0.5 text-[10px] font-bold text-[#181c28]">[SELESAI]</span>
-                    </div>
-                    <div class="text-xs text-[#181c28]">
-                        Setrika Saja (3.2 Kg)
-                    </div>
-                    <div class="flex items-center justify-between pt-1 text-[11px] text-slate-500 border-t border-slate-100">
-                        <div>
-                            <span>12 Okt 2024</span>
-                            <span class="mx-1">|</span>
-                            <span class="font-bold text-[#181c28]">Rp 19.200</span>
-                        </div>
-                        <a class="font-bold text-[#181c28] hover:underline" href="riwayat.php#YYL-8712">[LIHAT DETAIL]</a>
-                    </div>
-                </article>
+                <?php else: ?>
+                    <?php foreach ($recentOrders as $ro): ?>
+                        <?php
+                        $rQty = strtoupper($ro['unit']) === 'KG'
+                            ? number_format((float)$ro['weight'], 1) . ' Kg'
+                            : (int)$ro['weight'] . ' Pcs';
+                        ?>
+                        <article class="bg-white border border-slate-200 p-3.5 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-bold text-[#181c28]"><?= htmlspecialchars($ro['receipt_no']) ?></span>
+                                <span class="bg-[#eef2f9] px-2 py-0.5 text-[10px] font-bold text-[#181c28]">[SELESAI]</span>
+                            </div>
+                            <div class="text-xs text-[#181c28]">
+                                <?= htmlspecialchars($ro['service_name']) ?> (<?= $rQty ?>)
+                            </div>
+                            <div class="flex items-center justify-between pt-1 text-[11px] text-slate-500 border-t border-slate-100">
+                                <div>
+                                    <span><?= date('d M Y', strtotime($ro['created_at'])) ?></span>
+                                    <span class="mx-1">|</span>
+                                    <span class="font-bold text-[#181c28]">Rp <?= number_format((int)$ro['total_price'], 0, ',', '.') ?></span>
+                                </div>
+                                <a class="font-bold text-[#181c28] hover:underline" href="riwayat.php#<?= urlencode(ltrim($ro['receipt_no'], '#')) ?>">[LIHAT DETAIL]</a>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </section>
-            <!-- END: RecentHistorySection -->
         </main>
-        <!-- END: MainContent -->
 
         <?php require __DIR__ . '/includes/bottom-nav.php'; ?>
     </div>
