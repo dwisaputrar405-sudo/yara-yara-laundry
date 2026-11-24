@@ -1,6 +1,8 @@
 <?php
 require __DIR__ . '/includes/guard.php';
 $activeNav = 'profil';
+$cust = $_SESSION['customer'];
+$initials = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $cust['name']), 0, 2) ?: 'YL');
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -27,7 +29,6 @@ $activeNav = 'profil';
     <div class="max-w-md mx-auto min-h-screen bg-[#f4f5f7] border-x border-slate-200 flex flex-col">
         <?php require __DIR__ . '/includes/header.php'; ?>
 
-        <!-- BEGIN: MainContent -->
         <main class="flex-1 px-4 py-5 space-y-6">
             <div class="flex flex-col w-full space-y-4">
                 <div class="flex items-center">
@@ -44,11 +45,11 @@ $activeNav = 'profil';
                     <div class="flex items-start justify-between mb-3">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 bg-[#181c28] text-white flex items-center justify-center font-bold text-base tracking-widest rounded-none shadow-sm">
-                                [BS]
+                                [<?= htmlspecialchars($initials) ?>]
                             </div>
                             <div>
-                                <h1 id="profile-name-display" class="text-base font-bold tracking-tight text-slate-900 leading-tight">Budi Santoso</h1>
-                                <p id="profile-phone-display" class="text-xs text-slate-500 mt-0.5">+62 812-3456-7890</p>
+                                <h1 id="profile-name-display" class="text-base font-bold tracking-tight text-slate-900 leading-tight"><?= htmlspecialchars($cust['name']) ?></h1>
+                                <p id="profile-phone-display" class="text-xs text-slate-500 mt-0.5"><?= htmlspecialchars($cust['phone']) ?></p>
                             </div>
                         </div>
                         <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 tracking-wider uppercase rounded-none">
@@ -57,29 +58,27 @@ $activeNav = 'profil';
                     </div>
                     <div class="bg-[#eef2f9] px-3 py-2 flex items-center justify-between text-[11px] text-slate-700">
                         <span class="font-bold tracking-tight">[MEMBER TERVERIFIKASI]</span>
-                        <span class="text-slate-500 text-[10px]">ID: YR-884920</span>
+                        <span class="text-slate-500 text-[10px]">ID: YR-<?= str_pad((string)$cust['id'], 6, '0', STR_PAD_LEFT) ?></span>
                     </div>
                 </section>
 
-                <!-- Quick Metrics -->
                 <section class="grid grid-cols-2 gap-2">
                     <div class="bg-white border border-slate-200 p-3 shadow-sm flex flex-col justify-between">
                         <span class="text-[10px] text-slate-400 uppercase tracking-wider">TOTAL CUCIAN</span>
                         <div class="flex items-baseline gap-1 mt-1">
-                            <span class="text-lg font-bold text-slate-900">24</span>
+                            <span class="text-lg font-bold text-slate-900">0</span>
                             <span class="text-[10px] text-slate-500">Order</span>
                         </div>
                     </div>
                     <div class="bg-white border border-slate-200 p-3 shadow-sm flex flex-col justify-between">
                         <span class="text-[10px] text-slate-400 uppercase tracking-wider">POIN REWARD</span>
                         <div class="flex items-baseline gap-1 mt-1">
-                            <span class="text-lg font-bold text-slate-900">450</span>
+                            <span class="text-lg font-bold text-slate-900">0</span>
                             <span class="text-[10px] text-slate-500">PTS</span>
                         </div>
                     </div>
                 </section>
 
-                <!-- Menu Akses Cepat -->
                 <div class="space-y-1.5">
                     <p class="text-[10px] tracking-widest text-slate-400 uppercase px-1">DATA AKUN &amp; LAYANAN</p>
                     <div class="bg-white border border-slate-200 shadow-sm divide-y divide-slate-100 overflow-hidden">
@@ -96,7 +95,7 @@ $activeNav = 'profil';
                                 <span class="text-xs font-bold text-slate-900 tracking-tight">[ALAMAT TERSIMPAN]</span>
                                 <span class="text-slate-400">→</span>
                             </div>
-                            <p id="profile-address-display" class="text-[11px] text-slate-600 mt-0.5 truncate">Jl. Sasak Dempul, Bekasi</p>
+                            <p id="profile-address-display" class="text-[11px] text-slate-600 mt-0.5 truncate"><?= htmlspecialchars($cust['address'] ?: 'Belum ada alamat tersimpan') ?></p>
                         </button>
 
                         <a class="block p-3.5 hover:bg-slate-50 transition-colors bg-white" href="riwayat.php">
@@ -117,7 +116,6 @@ $activeNav = 'profil';
                     </div>
                 </div>
 
-                <!-- Keamanan & Sesi -->
                 <div class="space-y-1.5 pt-1">
                     <p class="text-[10px] tracking-widest text-slate-400 uppercase px-1">KEAMANAN &amp; SESI</p>
                     <div class="bg-white border border-slate-200 shadow-sm overflow-hidden">
@@ -141,11 +139,9 @@ $activeNav = 'profil';
                 </div>
             </div>
         </main>
-        <!-- END: MainContent -->
 
         <?php require __DIR__ . '/includes/bottom-nav.php'; ?>
 
-        <!-- Modal Edit Profil -->
         <div id="modal-edit-profile" class="hidden fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
             <div class="w-full max-w-[340px] bg-white border-2 border-[#181c28] p-4 space-y-3 text-xs">
                 <div class="flex items-center justify-between border-b border-slate-200 pb-2 font-bold">
@@ -154,17 +150,16 @@ $activeNav = 'profil';
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase mb-1">NAMA LENGKAP</label>
-                    <input id="input-profile-name" type="text" value="Budi Santoso" class="w-full border border-slate-400 px-2.5 py-2 text-xs">
+                    <input id="input-profile-name" type="text" value="<?= htmlspecialchars($cust['name']) ?>" class="w-full border border-slate-400 px-2.5 py-2 text-xs">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase mb-1">NO WHATSAPP</label>
-                    <input id="input-profile-phone" type="text" value="+62 812-3456-7890" class="w-full border border-slate-400 px-2.5 py-2 text-xs">
+                    <input id="input-profile-phone" type="text" value="<?= htmlspecialchars($cust['phone']) ?>" class="w-full border border-slate-400 px-2.5 py-2 text-xs">
                 </div>
                 <button type="button" onclick="saveProfileData()" class="w-full bg-[#181c28] text-white font-bold py-2.5">[SIMPAN PERUBAHAN]</button>
             </div>
         </div>
 
-        <!-- Modal Alamat Tersimpan -->
         <div id="modal-edit-address" class="hidden fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
             <div class="w-full max-w-[340px] bg-white border-2 border-[#181c28] p-4 space-y-3 text-xs">
                 <div class="flex items-center justify-between border-b border-slate-200 pb-2 font-bold">
@@ -173,13 +168,12 @@ $activeNav = 'profil';
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase mb-1">ALAMAT LENGKAP</label>
-                    <textarea id="input-profile-address" rows="3" class="w-full border border-slate-400 p-2 text-xs">Jl. Sasak Dempul, Bekasi</textarea>
+                    <textarea id="input-profile-address" rows="3" class="w-full border border-slate-400 p-2 text-xs"><?= htmlspecialchars($cust['address'] ?? '') ?></textarea>
                 </div>
                 <button type="button" onclick="saveAddressData()" class="w-full bg-[#181c28] text-white font-bold py-2.5">[SIMPAN ALAMAT]</button>
             </div>
         </div>
 
-        <!-- Modal Ganti Kata Sandi -->
         <div id="modal-edit-password" class="hidden fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
             <div class="w-full max-w-[340px] bg-white border-2 border-[#181c28] p-4 space-y-3 text-xs">
                 <div class="flex items-center justify-between border-b border-slate-200 pb-2 font-bold">
@@ -188,9 +182,9 @@ $activeNav = 'profil';
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase mb-1">KATA SANDI BARU</label>
-                    <input type="password" placeholder="Minimal 6 karakter" class="w-full border border-slate-400 px-2.5 py-2 text-xs">
+                    <input id="input-new-password" type="password" placeholder="Minimal 6 karakter" class="w-full border border-slate-400 px-2.5 py-2 text-xs">
                 </div>
-                <button type="button" onclick="closeProfileModal('modal-edit-password'); alert('Kata sandi berhasil diperbarui.');" class="w-full bg-[#181c28] text-white font-bold py-2.5">[PERBARUI SANDI]</button>
+                <button type="button" onclick="saveNewPassword()" class="w-full bg-[#181c28] text-white font-bold py-2.5">[PERBARUI SANDI]</button>
             </div>
         </div>
     </div>
@@ -199,22 +193,58 @@ $activeNav = 'profil';
         function openProfileModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeProfileModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        function saveProfileData() {
-            document.getElementById('profile-name-display').textContent = document.getElementById('input-profile-name').value;
-            document.getElementById('profile-phone-display').textContent = document.getElementById('input-profile-phone').value;
+        async function saveProfileData() {
+            const name = document.getElementById('input-profile-name').value.trim();
+            const phone = document.getElementById('input-profile-phone').value.trim();
+            const res = await fetch('../api/user.php?route=profile&action=update', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) return alert(data.error || 'Gagal menyimpan profil.');
+
+            document.getElementById('profile-name-display').textContent = data.customer.name;
+            document.getElementById('profile-phone-display').textContent = data.customer.phone;
             closeProfileModal('modal-edit-profile');
+            alert('Profil berhasil diperbarui!');
         }
 
-        function saveAddressData() {
-            document.getElementById('profile-address-display').textContent = document.getElementById('input-profile-address').value;
+        async function saveAddressData() {
+            const address = document.getElementById('input-profile-address').value.trim();
+            const res = await fetch('../api/user.php?route=profile&action=update', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) return alert(data.error || 'Gagal menyimpan alamat.');
+
+            document.getElementById('profile-address-display').textContent = data.customer.address || 'Belum ada alamat tersimpan';
             closeProfileModal('modal-edit-address');
+            alert('Alamat berhasil disimpan!');
         }
 
-        document.getElementById('logoutBtn')?.addEventListener('click', function () {
+        async function saveNewPassword() {
+            const new_password = document.getElementById('input-new-password').value;
+            const res = await fetch('../api/user.php?route=profile&action=change_password', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ new_password })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) return alert(data.error || 'Gagal memperbarui kata sandi.');
+
+            document.getElementById('input-new-password').value = '';
+            closeProfileModal('modal-edit-password');
+            alert('Kata sandi berhasil diperbarui.');
+        }
+
+        document.getElementById('logoutBtn')?.addEventListener('click', async function () {
             if (confirm('Konfirmasi: Apakah Anda yakin ingin keluar dari akun Yara Laundry?')) {
                 this.textContent = '[ SEDANG KELUAR... ]';
-                this.classList.add('opacity-75');
-                setTimeout(() => { window.location.href = 'login.php'; }, 500);
+                await fetch('../api/user.php?route=auth&action=logout');
+                window.location.href = 'login.php';
             }
         });
     </script>

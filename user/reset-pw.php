@@ -23,11 +23,10 @@ session_start();
 </head>
 
 <body class="min-h-screen flex flex-col items-center justify-center bg-[#f4f5f7]">
-    <div class="w-full max-w-md min-h-screen bg-[#f4f5f7] border-x border-slate-200 flex flex-col" data-purpose="mobile-app-shell">
-        <!-- BEGIN: MainContent -->
-        <main class="flex-1 p-4 py-8 flex flex-col" data-purpose="reset-main-content">
+    <div class="w-full max-w-md min-h-screen bg-[#f4f5f7] border-x border-slate-200 flex flex-col">
+        <main class="flex-1 p-4 py-8 flex flex-col">
             <div class="my-auto flex flex-col gap-4 w-full">
-                <section class="bg-white border-2 border-[#181c28] p-4" data-purpose="page-header-card">
+                <section class="bg-white border-2 border-[#181c28] p-4">
                     <h1 class="text-base font-bold tracking-tight uppercase">
                         LUPA KATA SANDI
                     </h1>
@@ -36,9 +35,9 @@ session_start();
                     </p>
                 </section>
 
-                <section class="bg-white border-2 border-[#181c28] p-4" data-purpose="reset-form-card">
+                <section class="bg-white border-2 border-[#181c28] p-4">
                     <form class="flex flex-col gap-4" id="reset-password-form" method="POST">
-                        <div class="flex flex-col gap-1.5" data-purpose="phone-input-group">
+                        <div class="flex flex-col gap-1.5">
                             <label class="text-xs font-bold uppercase tracking-wide" for="phone-number">
                                 NOMOR TELEPON / WHATSAPP [WAJIB]
                             </label>
@@ -59,7 +58,7 @@ session_start();
                     </form>
                 </section>
 
-                <section class="bg-[#f4f5f7] border-2 border-[#181c28] p-4 flex flex-col gap-3" data-purpose="back-login-card">
+                <section class="bg-[#f4f5f7] border-2 border-[#181c28] p-4 flex flex-col gap-3">
                     <div class="text-xs font-bold uppercase">
                         INGAT KATA SANDI ANDA?
                     </div>
@@ -68,7 +67,7 @@ session_start();
                     </a>
                 </section>
 
-                <footer class="bg-white border-2 border-[#181c28] p-3.5 text-xs" data-purpose="operational-help-footer">
+                <footer class="bg-white border-2 border-[#181c28] p-3.5 text-xs">
                     <div class="flex items-center gap-1.5 font-bold uppercase mb-1">
                         <span class="text-red-700">[!]</span>
                         <span>BANTUAN TEKNIS</span>
@@ -79,14 +78,22 @@ session_start();
                 </footer>
             </div>
         </main>
-        <!-- END: MainContent -->
     </div>
 
     <script>
-        document.getElementById('reset-password-form').addEventListener('submit', (e) => {
+        document.getElementById('reset-password-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const phone = document.getElementById('phone-number').value.trim();
-            sessionStorage.setItem('yaraResetPhone', '+62 ' + phone);
+            const res = await fetch('../api/user.php?route=auth&action=request_otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, purpose: 'RESET_PASSWORD' })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) return alert(data.error || 'Nomor tidak terdaftar.');
+
+            sessionStorage.setItem('yaraResetPhone', data.phone);
+            alert('SIMULASI WA OTP RESET: Kode Anda adalah ' + data.demo_otp);
             window.location.href = 'otp-reset-pw.php';
         });
     </script>

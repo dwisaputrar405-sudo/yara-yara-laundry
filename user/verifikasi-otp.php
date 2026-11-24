@@ -18,7 +18,6 @@
 
 <body class="bg-[#f4f5f7] text-[#181c28] antialiased min-h-screen flex flex-col">
     <div class="max-w-md w-full mx-auto min-h-screen bg-[#f4f5f7] border-x border-slate-200 flex flex-col">
-        <!-- BEGIN: MainContent -->
         <main class="w-full px-4 py-8 flex-1 flex flex-col">
             <div class="my-auto flex flex-col gap-4 w-full">
                 <section data-purpose="page-header">
@@ -40,11 +39,11 @@
                     <div class="space-y-2 text-xs">
                         <div class="flex justify-between items-baseline gap-2">
                             <span class="text-slate-500 uppercase">Nama</span>
-                            <span id="otp-reg-name" class="font-bold text-right">Budi Santoso</span>
+                            <span id="otp-reg-name" class="font-bold text-right">-</span>
                         </div>
                         <div class="flex justify-between items-baseline gap-2">
                             <span class="text-slate-500 uppercase">Telepon</span>
-                            <span id="otp-reg-phone" class="font-bold text-right">+62 812-3456-7890</span>
+                            <span id="otp-reg-phone" class="font-bold text-right">-</span>
                         </div>
                     </div>
                     <div class="mt-3 pt-2.5 border-t border-[#eef2f9] text-right">
@@ -59,19 +58,19 @@
                         <span class="text-[11px] font-bold tracking-tight">[SEKSI 2. INPUT KODE OTP]</span>
                     </div>
                     <p class="text-xs text-slate-700 mb-4">
-                        Masukkan 6 digit kode yang dikirim ke <strong id="otp-target-phone" class="text-[#181c28]">+62 812-3456-7890</strong>.
+                        Masukkan 6 digit kode yang dikirim ke <strong id="otp-target-phone" class="text-[#181c28]">-</strong>.
                     </p>
                     <div class="grid grid-cols-6 gap-2 mb-4" data-purpose="otp-input-group" id="otp-container">
-                        <input aria-label="Digit 1" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white" inputmode="numeric" maxlength="1" type="text" value="4">
-                        <input aria-label="Digit 2" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white" inputmode="numeric" maxlength="1" type="text" value="9">
-                        <input aria-label="Digit 3" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white" inputmode="numeric" maxlength="1" type="text" value="2">
+                        <input aria-label="Digit 1" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
+                        <input aria-label="Digit 2" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
+                        <input aria-label="Digit 3" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
                         <input aria-label="Digit 4" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
                         <input aria-label="Digit 5" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
                         <input aria-label="Digit 6" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
                     </div>
                     <div class="bg-[#eef2f9] px-3 py-2.5 text-center space-y-1">
                         <div class="text-xs font-medium text-[#181c28]">
-                            Sisa waktu: <strong class="font-extrabold" id="otp-timer">01:45</strong>
+                            Sisa waktu: <strong class="font-extrabold" id="otp-timer">05:00</strong>
                         </div>
                         <button id="btn-resend-otp" class="text-[11px] font-bold text-slate-500 hover:text-[#181c28] underline" type="button">
                             [KIRIM ULANG KODE]
@@ -99,18 +98,14 @@
                 </section>
             </div>
         </main>
-        <!-- END: MainContent -->
     </div>
 
     <script>
-        const regRaw = sessionStorage.getItem('yaraRegData');
-        if (regRaw) {
-            const reg = JSON.parse(regRaw);
-            if (reg.name) document.getElementById('otp-reg-name').textContent = reg.name;
-            if (reg.phone) {
-                document.getElementById('otp-reg-phone').textContent = reg.phone;
-                document.getElementById('otp-target-phone').textContent = reg.phone;
-            }
+        const reg = JSON.parse(sessionStorage.getItem('yaraRegData') || '{}');
+        if (reg.name) document.getElementById('otp-reg-name').textContent = reg.name;
+        if (reg.phone) {
+            document.getElementById('otp-reg-phone').textContent = reg.phone;
+            document.getElementById('otp-target-phone').textContent = reg.phone;
         }
 
         const otpInputs = document.querySelectorAll('.otp-input');
@@ -125,27 +120,43 @@
             });
         });
 
-        let remaining = 105;
+        let remaining = 300;
         const timerEl = document.getElementById('otp-timer');
         setInterval(() => {
             if (remaining > 0) {
                 remaining--;
-                const m = String(Math.floor(remaining / 60)).padStart(2, '0');
-                const s = String(remaining % 60).padStart(2, '0');
-                timerEl.textContent = `${m}:${s}`;
+                timerEl.textContent = `${String(Math.floor(remaining / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`;
             }
         }, 1000);
 
-        document.getElementById('btn-resend-otp').addEventListener('click', () => {
-            remaining = 105;
-            alert('Kode OTP baru telah dikirim.');
+        document.getElementById('btn-resend-otp').addEventListener('click', async () => {
+            const res = await fetch('../api/user.php?route=auth&action=request_otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: reg.name, phone: reg.phone, password: reg.password, purpose: 'REGISTRASI' })
+            });
+            const data = await res.json();
+            if (!res.ok) return alert(data.error || 'Gagal kirim ulang.');
+            remaining = 300;
+            alert('SIMULASI WA OTP BARU: ' + data.demo_otp);
         });
 
-        document.getElementById('btn-verify-otp').addEventListener('click', () => {
+        document.getElementById('btn-verify-otp').addEventListener('click', async () => {
             if (!document.getElementById('agree-terms').checked) {
-                alert('Silakan centang persetujuan Ketentuan Layanan terlebih dahulu.');
-                return;
+                return alert('Silakan centang persetujuan Ketentuan Layanan terlebih dahulu.');
             }
+            const otp = Array.from(otpInputs).map(i => i.value).join('');
+            if (otp.length < 6) return alert('Masukkan 6 digit kode OTP.');
+
+            const res = await fetch('../api/user.php?route=auth&action=verify_otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: reg.phone, name: reg.name, password: reg.password, otp, purpose: 'REGISTRASI' })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) return alert(data.error || 'Verifikasi gagal.');
+
+            sessionStorage.removeItem('yaraRegData');
             window.location.href = 'index.php';
         });
     </script>

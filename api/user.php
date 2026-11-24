@@ -13,7 +13,6 @@ function normalizePhone($raw)
     } elseif (!str_starts_with($digits, '62')) {
         $digits = '62' . $digits;
     }
-    // Format standar database: +62 812-3456-7890
     $local = substr($digits, 2);
     if (strlen($local) >= 9) {
         return '+62 ' . substr($local, 0, 3) . '-' . substr($local, 3, 4) . '-' . substr($local, 7);
@@ -30,9 +29,6 @@ function requireCustomer()
 }
 
 try {
-    // =========================================================
-    // 1. AUTENTIKASI PELANGGAN (LOGIN, REGISTER, OTP, RESET PW)
-    // =========================================================
     if ($route === 'auth') {
         if ($action === 'me') {
             jsonOut(['authenticated' => true, 'customer' => requireCustomer()]);
@@ -65,12 +61,11 @@ try {
                 'id'      => (int)$cust['id'],
                 'name'    => $cust['name'],
                 'phone'   => $cust['phone'],
-                'address' => $cust['address']
+                'address' => $cust['address'] ?? ''
             ];
             jsonOut(['success' => true, 'customer' => $_SESSION['customer']]);
         }
 
-        // Kirim / Generate OTP (Registrasi atau Reset Password)
         if ($method === 'POST' && $action === 'request_otp') {
             $in      = jsonIn();
             $phone   = normalizePhone($in['phone'] ?? '');
@@ -97,7 +92,6 @@ try {
             $pdo->prepare("INSERT INTO otp_codes (phone, purpose, code_hash, expires_at) VALUES (?, ?, ?, ?)")
                 ->execute([$phone, $purpose, password_hash($otpCode, PASSWORD_BCRYPT), $expires]);
 
-            // Simpan sementara data registrasi/reset di session
             $_SESSION['otp_pending'] = [
                 'phone'   => $phone,
                 'purpose' => $purpose,
@@ -105,16 +99,14 @@ try {
                 'pass'    => $in['password'] ?? ''
             ];
 
-            // Catatan: demo_otp ditampilkan di response selama belum terhubung ke WA Gateway berbayar
             jsonOut([
                 'success'  => true,
                 'phone'    => $phone,
                 'demo_otp' => $otpCode,
-                'message'  => 'Kode OTP berhasil dikirim ke WhatsApp ' . $phone
+                'message'  => 'Kode OTP terkirim ke ' . $phone
             ]);
         }
 
-        // Verifikasi OTP (Registrasi atau Reset Password)
         if ($method === 'POST' && $action === 'verify_otp') {
             $in      = jsonIn();
             $phone   = normalizePhone($in['phone'] ?? ($_SESSION['otp_pending']['phone'] ?? ''));
@@ -152,12 +144,12 @@ try {
                     $pdo->prepare("UPDATE customers SET name = ?, password_hash = ? WHERE id = ?")
                         ->execute([$name, $hash, $row['id']]);
                     $custId = (int)$row['id'];
-                    $addr   = $row['address'];
+                    $addr   = $row['address'] ?? '';
                 } else {
                     $pdo->prepare("INSERT INTO customers (name, phone, password_hash) VALUES (?, ?, ?)")
                         ->execute([$name, $phone, $hash]);
                     $custId = (int)$pdo->lastInsertId();
-                    $addr   = null;
+                    $addr   = '';
                 }
 
                 unset($_SESSION['otp_pending']);
@@ -178,9 +170,6 @@ try {
         }
     }
 
-    // =========================================================
-    // 2. PROFIL PELANGGAN (EDIT NAMA, NO WA, ALAMAT, PASSWORD)
-    // =========================================================
     if ($route === 'profile') {
         $cust = requireCustomer();
         $in   = jsonIn();
@@ -197,6 +186,16 @@ try {
             $_SESSION['customer']['phone']   = $phone;
             $_SESSION['customer']['address'] = $address;
             jsonOut(['success' => true, 'customer' => $_SESSION['customer']]);
+        }
+
+        if ($method === 'PUT' && $action === 'change_password') {
+            $newPass = $in['new_password'] ?? '';
+            if (strlen($newPass) < 6) {
+                jsonOut(['error' => 'Kata sandi baru minimal 6 karakter.'], 400);
+            }
+            $pdo->prepare("UPDATE customers SET password_hash = ? WHERE id = ?")
+                ->execute([password_hash($newPass, PASSWORD_BCRYPT), $cust['id']]);
+            jsonOut(['success' => true]);
         }
     }
 

@@ -23,11 +23,10 @@ session_start();
 </head>
 
 <body class="min-h-screen flex flex-col items-center justify-center bg-[#f4f5f7]">
-    <div class="w-full max-w-md min-h-screen bg-[#f4f5f7] border-x border-slate-200 flex flex-col" data-purpose="mobile-app-shell">
-        <!-- BEGIN: MainContent -->
-        <main class="flex-1 p-4 py-8 flex flex-col" data-purpose="otp-reset-main-content">
+    <div class="w-full max-w-md min-h-screen bg-[#f4f5f7] border-x border-slate-200 flex flex-col">
+        <main class="flex-1 p-4 py-8 flex flex-col">
             <div class="my-auto flex flex-col gap-4 w-full">
-                <section class="bg-white border-2 border-[#181c28] p-4" data-purpose="page-header-card">
+                <section class="bg-white border-2 border-[#181c28] p-4">
                     <h1 class="text-base font-bold tracking-tight uppercase">
                         VERIFIKASI OTP PEMULIHAN
                     </h1>
@@ -36,11 +35,11 @@ session_start();
                     </p>
                 </section>
 
-                <section class="bg-white border-2 border-[#181c28] p-4 flex flex-col gap-4" data-purpose="otp-form-card">
+                <section class="bg-white border-2 border-[#181c28] p-4 flex flex-col gap-4">
                     <div class="bg-[#f4f5f7] border border-[#181c28] px-3 py-2 flex items-center justify-between gap-2 text-xs">
                         <div>
                             <span class="text-[10px] text-slate-500 block uppercase">TUJUAN OTP</span>
-                            <strong id="reset-target-phone" class="text-[#181c28]">+62 812-3456-7890</strong>
+                            <strong id="reset-target-phone" class="text-[#181c28]">-</strong>
                         </div>
                         <a href="reset-pw.php" class="text-[11px] font-bold uppercase underline hover:text-slate-600">
                             [UBAH]
@@ -48,10 +47,10 @@ session_start();
                     </div>
 
                     <form class="flex flex-col gap-4" id="otp-reset-form" method="POST">
-                        <div class="grid grid-cols-6 gap-2" data-purpose="otp-input-group">
-                            <input aria-label="Digit 1" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none" inputmode="numeric" maxlength="1" type="text" value="4" />
-                            <input aria-label="Digit 2" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none" inputmode="numeric" maxlength="1" type="text" value="9" />
-                            <input aria-label="Digit 3" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none" inputmode="numeric" maxlength="1" type="text" value="2" />
+                        <div class="grid grid-cols-6 gap-2">
+                            <input aria-label="Digit 1" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
+                            <input aria-label="Digit 2" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
+                            <input aria-label="Digit 3" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
                             <input aria-label="Digit 4" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
                             <input aria-label="Digit 5" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
                             <input aria-label="Digit 6" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
@@ -59,11 +58,16 @@ session_start();
 
                         <div class="bg-[#f4f5f7] border border-slate-300 px-3 py-2.5 text-center space-y-1">
                             <div class="text-xs font-medium text-[#181c28]">
-                                Sisa waktu: <strong class="font-extrabold" id="otp-timer">01:45</strong>
+                                Sisa waktu: <strong class="font-extrabold" id="otp-timer">05:00</strong>
                             </div>
                             <button id="btn-resend-otp" class="text-[11px] font-bold text-slate-600 hover:text-[#181c28] underline uppercase" type="button">
                                 [KIRIM ULANG KODE OTP]
                             </button>
+                        </div>
+
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold uppercase tracking-wide" for="new-reset-password">KATA SANDI BARU [MIN. 6 KARAKTER]</label>
+                            <input id="new-reset-password" type="password" required minlength="6" placeholder="••••••••" class="w-full px-3 py-2.5 text-sm bg-white border-2 border-[#181c28] focus:ring-0 focus:outline-none" />
                         </div>
 
                         <button class="w-full bg-[#181c28] text-white py-3.5 px-4 text-xs font-bold uppercase tracking-wider border-2 border-[#181c28] hover:bg-slate-800 active:translate-y-0.5 transition-transform" type="submit">
@@ -76,7 +80,7 @@ session_start();
                     </form>
                 </section>
 
-                <footer class="bg-white border-2 border-[#181c28] p-3.5 text-xs" data-purpose="operational-help-footer">
+                <footer class="bg-white border-2 border-[#181c28] p-3.5 text-xs">
                     <div class="flex items-center gap-1.5 font-bold uppercase mb-1">
                         <span class="text-red-700">[!]</span>
                         <span>BANTUAN TEKNIS</span>
@@ -87,14 +91,11 @@ session_start();
                 </footer>
             </div>
         </main>
-        <!-- END: MainContent -->
     </div>
 
     <script>
-        const savedPhone = sessionStorage.getItem('yaraResetPhone');
-        if (savedPhone) {
-            document.getElementById('reset-target-phone').textContent = savedPhone;
-        }
+        const savedPhone = sessionStorage.getItem('yaraResetPhone') || '';
+        if (savedPhone) document.getElementById('reset-target-phone').textContent = savedPhone;
 
         const otpInputs = document.querySelectorAll('.otp-input');
         otpInputs.forEach((input, index) => {
@@ -108,29 +109,43 @@ session_start();
             });
         });
 
-        let remaining = 105;
+        let remaining = 300;
         const timerEl = document.getElementById('otp-timer');
         setInterval(() => {
             if (remaining > 0) {
                 remaining--;
-                const m = String(Math.floor(remaining / 60)).padStart(2, '0');
-                const s = String(remaining % 60).padStart(2, '0');
-                timerEl.textContent = `${m}:${s}`;
+                timerEl.textContent = `${String(Math.floor(remaining / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`;
             }
         }, 1000);
 
-        document.getElementById('btn-resend-otp').addEventListener('click', () => {
-            remaining = 105;
-            alert('Kode OTP pemulihan baru telah dikirim.');
+        document.getElementById('btn-resend-otp').addEventListener('click', async () => {
+            const res = await fetch('../api/user.php?route=auth&action=request_otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: savedPhone, purpose: 'RESET_PASSWORD' })
+            });
+            const data = await res.json();
+            if (!res.ok) return alert(data.error || 'Gagal kirim ulang.');
+            remaining = 300;
+            alert('SIMULASI WA OTP BARU: ' + data.demo_otp);
         });
 
-        document.getElementById('otp-reset-form').addEventListener('submit', (e) => {
+        document.getElementById('otp-reset-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const code = Array.from(otpInputs).map(i => i.value).join('');
-            if (code.length < 6) {
-                alert('Masukkan 6 digit kode OTP terlebih dahulu.');
-                return;
-            }
+            const otp = Array.from(otpInputs).map(i => i.value).join('');
+            const new_password = document.getElementById('new-reset-password').value;
+            if (otp.length < 6) return alert('Masukkan 6 digit kode OTP terlebih dahulu.');
+
+            const res = await fetch('../api/user.php?route=auth&action=verify_otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: savedPhone, otp, new_password, purpose: 'RESET_PASSWORD' })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) return alert(data.error || 'Gagal mengatur ulang sandi.');
+
+            sessionStorage.removeItem('yaraResetPhone');
+            alert('Kata sandi berhasil diperbarui! Silakan login dengan sandi baru.');
             window.location.href = 'login.php';
         });
     </script>
