@@ -1,8 +1,36 @@
 <?php
 require __DIR__ . '/includes/guard.php';
+require_once __DIR__ . '/../config/database.php';
+
 $activeNav = 'profil';
+$custId = (int)$_SESSION['customer']['id'];
+
+// Sinkronkan data terbaru dari database
+$stmtCust = $pdo->prepare("SELECT id, name, phone, address FROM customers WHERE id = ? LIMIT 1");
+$stmtCust->execute([$custId]);
+if ($freshCust = $stmtCust->fetch()) {
+    $_SESSION['customer'] = [
+        'id'      => (int)$freshCust['id'],
+        'name'    => $freshCust['name'],
+        'phone'   => $freshCust['phone'],
+        'address' => $freshCust['address'] ?? ''
+    ];
+}
 $cust = $_SESSION['customer'];
 $initials = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $cust['name']), 0, 2) ?: 'YL');
+
+// Hitung total pesanan & poin reward (10 poin tiap pesanan selesai)
+$stmtStat = $pdo->prepare("
+    SELECT 
+        COUNT(*) AS total_orders,
+        COALESCE(SUM(CASE WHEN status_step = 7 THEN 10 ELSE 0 END), 0) AS reward_points
+    FROM orders
+    WHERE customer_id = ?
+");
+$stmtStat->execute([$custId]);
+$stats = $stmtStat->fetch();
+$totalOrders  = (int)($stats['total_orders'] ?? 0);
+$rewardPoints = (int)($stats['reward_points'] ?? 0);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -44,7 +72,7 @@ $initials = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $cust['name']), 0,
                 <section class="bg-white border border-slate-200 p-4 shadow-sm">
                     <div class="flex items-start justify-between mb-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-[#181c28] text-white flex items-center justify-center font-bold text-base tracking-widest rounded-none shadow-sm">
+                            <div id="profile-initials-display" class="w-12 h-12 bg-[#181c28] text-white flex items-center justify-center font-bold text-base tracking-widest rounded-none shadow-sm">
                                 [<?= htmlspecialchars($initials) ?>]
                             </div>
                             <div>
@@ -66,14 +94,14 @@ $initials = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $cust['name']), 0,
                     <div class="bg-white border border-slate-200 p-3 shadow-sm flex flex-col justify-between">
                         <span class="text-[10px] text-slate-400 uppercase tracking-wider">TOTAL CUCIAN</span>
                         <div class="flex items-baseline gap-1 mt-1">
-                            <span class="text-lg font-bold text-slate-900">0</span>
+                            <span class="text-lg font-bold text-slate-900"><?= $totalOrders ?></span>
                             <span class="text-[10px] text-slate-500">Order</span>
                         </div>
                     </div>
                     <div class="bg-white border border-slate-200 p-3 shadow-sm flex flex-col justify-between">
                         <span class="text-[10px] text-slate-400 uppercase tracking-wider">POIN REWARD</span>
                         <div class="flex items-baseline gap-1 mt-1">
-                            <span class="text-lg font-bold text-slate-900">0</span>
+                            <span class="text-lg font-bold text-slate-900"><?= $rewardPoints ?></span>
                             <span class="text-[10px] text-slate-500">PTS</span>
                         </div>
                     </div>
@@ -206,6 +234,8 @@ $initials = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $cust['name']), 0,
 
             document.getElementById('profile-name-display').textContent = data.customer.name;
             document.getElementById('profile-phone-display').textContent = data.customer.phone;
+            const newInit = (data.customer.name.replace(/[^A-Za-z]/g, '').slice(0, 2) || 'YL').toUpperCase();
+            document.getElementById('profile-initials-display').textContent = `[${newInit}]`;
             closeProfileModal('modal-edit-profile');
             alert('Profil berhasil diperbarui!');
         }
