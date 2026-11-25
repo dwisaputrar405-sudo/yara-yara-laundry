@@ -102,10 +102,27 @@ try {
                 'pass'    => $in['password'] ?? ''
             ];
 
+            // Kirim OTP sungguhan via Fonnte API
+            $waTarget = preg_replace('/\D+/', '', $phone);
+            $curl = curl_init();
+            curl_setopt_array($curl, [
+                CURLOPT_URL => 'https://api.fonnte.com/send',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => [
+                    'target'  => $waTarget,
+                    'message' => "Kode OTP Yara Yara Laundry kamu: *{$otpCode}*. Berlaku 5 menit."
+                ],
+                CURLOPT_HTTPHEADER => [
+                    'Authorization: x2ACPBFGNy6MCCZia7Ww'
+                ],
+            ]);
+            curl_exec($curl);
+            curl_close($curl);
+
             jsonOut([
                 'success'  => true,
                 'phone'    => $phone,
-                'demo_otp' => $otpCode,
                 'message'  => 'Kode OTP terkirim ke ' . $phone
             ]);
         }

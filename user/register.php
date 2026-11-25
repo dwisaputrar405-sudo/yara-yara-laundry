@@ -91,7 +91,8 @@
             if (!res.ok || !data.success) return alert(data.error || 'Gagal mengirim OTP.');
 
             sessionStorage.setItem('yaraRegData', JSON.stringify({ name, phone: data.phone, password }));
-            alert('SIMULASI WA OTP: Kode verifikasi Anda adalah ' + data.demo_otp);
+            // alert('SIMULASI WA OTP: Kode verifikasi Anda adalah ' + data.demo_otp);
+            alert('Kode OTP telah dikirim ke WhatsApp ' + data.phone);
             window.location.href = 'verifikasi-otp.php';
         });
     </script>
