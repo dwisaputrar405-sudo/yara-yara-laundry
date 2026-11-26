@@ -41,14 +41,6 @@ if ($reqCode !== '') {
     $order = $stmt->fetch();
 }
 
-// Ambil log aktivitas pesanan tersebut dari order_logs
-$logs = [];
-if ($order) {
-    $stmtLogs = $pdo->prepare("SELECT * FROM order_logs WHERE order_id = ? ORDER BY id DESC");
-    $stmtLogs->execute([$order['id']]);
-    $logs = $stmtLogs->fetchAll();
-}
-
 $stageBadges = [
     0 => 'MENUNGGU JEMPUT KURIR',
     1 => 'MENUNGGU TIMBANG',
@@ -123,9 +115,20 @@ $workflowSteps = [
                 $curStep = (int)$order['status_step'];
                 $displayStep = max(1, $curStep);
                 $pct = $curStep === 0 ? 5 : round(($curStep / 7) * 100, 1);
+                $qtyNum = (float)$order['weight'];
                 $qtyText = strtoupper($order['unit']) === 'KG'
-                    ? number_format((float)$order['weight'], 1) . ' Kg'
-                    : (int)$order['weight'] . ' Pcs';
+                    ? number_format($qtyNum, 1) . ' Kg'
+                    : (int)$qtyNum . ' Pcs';
+
+                $totalPrice = (int)$order['total_price'];
+                $deliveryFee = (int)($order['delivery_fee'] ?? 0);
+                $unitPrice = (int)($order['price_per_unit'] ?? ($qtyNum > 0 ? round(($totalPrice - $deliveryFee) / $qtyNum) : 0));
+
+                $isDelivery = !empty($order['pickup_address']) || (isset($order['delivery_type']) && stripos((string)$order['delivery_type'], 'antar') !== false);
+                $methodText = isset($order['delivery_type']) && trim((string)$order['delivery_type']) !== ''
+                    ? strtoupper(str_replace('_', '-', (string)$order['delivery_type']))
+                    : ($isDelivery ? 'ANTAR-JEMPUT' : 'DIAMBIL SENDIRI');
+                $payMethod = !empty($order['payment_method']) ? ' - ' . strtoupper((string)$order['payment_method']) : '';
                 ?>
 
                 <!-- 1. Nomor Pelacakan -->
@@ -162,7 +165,7 @@ $workflowSteps = [
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="text-xs font-extrabold text-[#181c28]">Rp <?= number_format((int)$order['total_price'], 0, ',', '.') ?></div>
+                                <div class="text-xs font-extrabold text-[#181c28]">Rp <?= number_format($totalPrice, 0, ',', '.') ?></div>
                                 <div class="text-[10px] font-bold <?= $order['payment_status'] === 'LUNAS' ? 'text-emerald-700' : 'text-amber-700' ?>">
                                     <?= $order['payment_status'] === 'LUNAS' ? 'LUNAS' : 'BELUM BAYAR' ?>
                                 </div>
@@ -236,22 +239,44 @@ $workflowSteps = [
                     </div>
                 </section>
 
-                <!-- 4. Log Aktivitas Real-Time -->
-                <?php if (!empty($logs)): ?>
-                    <section class="bg-white border border-slate-300 p-4 space-y-2.5">
-                        <div class="text-xs font-bold text-[#181c28]">[LOG AKTIVITAS OUTLET]</div>
-                        <div class="space-y-2 divide-y divide-slate-100">
-                            <?php foreach ($logs as $lg): ?>
-                                <div class="pt-2 first:pt-0 text-[11px]">
-                                    <div class="text-[#181c28] font-medium"><?= htmlspecialchars($lg['action']) ?></div>
-                                    <div class="text-[10px] text-slate-500 mt-0.5">
-                                        <?= date('d M H:i', strtotime($lg['created_at'])) ?> • <?= htmlspecialchars($lg['actor']) ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
+                <!-- 4. Rincian Tagihan -->
+                <section class="bg-white border border-slate-300 p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-[#181c28] tracking-wide">[RINCIAN TAGIHAN]</span>
+                        <span class="text-[10px] text-slate-500 tracking-wider">GERAI UTAMA</span>
+                    </div>
+
+                    <div class="bg-[#eef2f9] border border-slate-200 p-3.5 space-y-2.5 text-xs">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[11px] text-slate-500">LAYANAN</span>
+                            <span class="font-bold text-[#181c28] text-right"><?= strtoupper(htmlspecialchars($order['service_name'])) ?></span>
                         </div>
-                    </section>
-                <?php endif; ?>
+
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[11px] text-slate-500">BEBAN</span>
+                            <span class="font-bold text-[#181c28] text-right">
+                                <?= strtoupper($qtyText) ?><?= $unitPrice > 0 ? ' &times; RP ' . number_format($unitPrice, 0, ',', '.') : '' ?><?= (int)$order['is_estimated_weight'] === 1 ? ' (EST.)' : '' ?>
+                            </span>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[11px] text-slate-500">METODE</span>
+                            <span class="font-bold text-[#181c28] text-right"><?= htmlspecialchars($methodText) ?></span>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[11px] text-slate-500">STATUS</span>
+                            <span class="border border-slate-400 bg-white px-2 py-0.5 text-[10px] font-bold <?= $order['payment_status'] === 'LUNAS' ? 'text-emerald-700' : 'text-amber-700' ?>">
+                                [<?= $order['payment_status'] === 'LUNAS' ? 'LUNAS' . htmlspecialchars($payMethod) : 'BELUM BAYAR' ?>]
+                            </span>
+                        </div>
+
+                        <div class="border-t border-slate-300 pt-2.5 mt-1 flex items-center justify-between gap-2">
+                            <span class="text-[11px] font-bold text-[#181c28]">TOTAL TAGIHAN</span>
+                            <span class="text-base font-extrabold text-[#181c28]">RP <?= number_format($totalPrice, 0, ',', '.') ?></span>
+                        </div>
+                    </div>
+                </section>
             <?php endif; ?>
         </main>
 
