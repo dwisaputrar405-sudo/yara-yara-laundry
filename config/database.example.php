@@ -6,9 +6,9 @@ date_default_timezone_set('Asia/Jakarta');
 
 try {
     $pdo = new PDO(
-        'mysql:host=sql212.infinityfree.com;dbname=if0_43528429_yara_laundry;charset=utf8mb4',
-        'if0_43528429',
-        'OVynaiTsH1Jb5Dk',
+        'mysql:host=localhost;dbname=yara_laundry;charset=utf8mb4',
+        'root',
+        '',
         [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
