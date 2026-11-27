@@ -15,18 +15,18 @@ session_start();
     <style data-purpose="typography-and-reset">
         body {
             font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            background-color: #f4f5f7;
-            color: #181c28;
+            background-color: #EEF4FA;
+            color: #0F2854;
             -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
 
-<body class="min-h-screen flex flex-col items-center justify-center bg-[#f4f5f7]">
-    <div class="w-full max-w-md min-h-screen bg-[#f4f5f7] border-x border-slate-200 flex flex-col">
+<body class="min-h-screen flex flex-col items-center justify-center bg-[#EEF4FA]">
+    <div class="w-full max-w-md min-h-screen bg-[#EEF4FA] border-x border-[#DCEAF7] flex flex-col">
         <main class="flex-1 p-4 py-8 flex flex-col">
             <div class="my-auto flex flex-col gap-4 w-full">
-                <section class="bg-white border-2 border-[#181c28] p-4">
+                <section class="bg-[#F8FBFF] border-2 border-[#0F2854] p-4">
                     <h1 class="text-base font-bold tracking-tight uppercase">
                         LUPA KATA SANDI
                     </h1>
@@ -35,14 +35,14 @@ session_start();
                     </p>
                 </section>
 
-                <section class="bg-white border-2 border-[#181c28] p-4">
+                <section class="bg-[#F8FBFF] border-2 border-[#0F2854] p-4">
                     <form class="flex flex-col gap-4" id="reset-password-form" method="POST">
                         <div class="flex flex-col gap-1.5">
                             <label class="text-xs font-bold uppercase tracking-wide" for="phone-number">
                                 NOMOR TELEPON / WHATSAPP [WAJIB]
                             </label>
-                            <div class="flex items-stretch border-2 border-[#181c28] bg-white">
-                                <span class="px-3 py-2.5 bg-[#f4f5f7] border-r-2 border-[#181c28] text-xs font-bold flex items-center select-none">
+                            <div class="flex items-stretch border-2 border-[#0F2854] bg-[#F8FBFF]">
+                                <span class="px-3 py-2.5 bg-[#EEF4FA] border-r-2 border-[#0F2854] text-xs font-bold flex items-center select-none">
                                     +62
                                 </span>
                                 <input class="w-full px-3 py-2.5 text-sm bg-transparent border-0 focus:ring-0 focus:outline-none placeholder:text-slate-400" id="phone-number" inputmode="numeric" name="phone" placeholder="812-3456-7890" required type="tel" />
@@ -52,28 +52,28 @@ session_start();
                             </p>
                         </div>
 
-                        <button class="w-full bg-[#181c28] text-white py-3.5 px-4 text-xs font-bold uppercase tracking-wider border-2 border-[#181c28] hover:bg-slate-800 active:translate-y-0.5 transition-transform" type="submit">
+                        <button class="w-full bg-[#0F2854] text-white py-3.5 px-4 text-xs font-bold uppercase tracking-wider border-2 border-[#0F2854] hover:bg-[#1C4D8D] active:translate-y-0.5 transition-transform" type="submit">
                             [KIRIM KODE OTP PEMULIHAN]
                         </button>
                     </form>
                 </section>
 
-                <section class="bg-[#f4f5f7] border-2 border-[#181c28] p-4 flex flex-col gap-3">
+                <section class="bg-[#EEF4FA] border-2 border-[#0F2854] p-4 flex flex-col gap-3">
                     <div class="text-xs font-bold uppercase">
                         INGAT KATA SANDI ANDA?
                     </div>
-                    <a class="w-full bg-white text-[#181c28] py-3 px-4 text-xs font-bold uppercase tracking-wide border-2 border-dashed border-[#181c28] text-center hover:bg-slate-50" href="login.php">
+                    <a class="w-full bg-[#F8FBFF] text-[#0F2854] py-3 px-4 text-xs font-bold uppercase tracking-wide border-2 border-dashed border-[#0F2854] text-center hover:bg-[#F5F9FE]" href="login.php">
                         [&lt;- KEMBALI KE HALAMAN LOGIN]
                     </a>
                 </section>
 
-                <footer class="bg-white border-2 border-[#181c28] p-3.5 text-xs">
+                <footer class="bg-[#F8FBFF] border-2 border-[#0F2854] p-3.5 text-xs">
                     <div class="flex items-center gap-1.5 font-bold uppercase mb-1">
                         <span class="text-red-700">[!]</span>
                         <span>BANTUAN TEKNIS</span>
                     </div>
                     <p class="text-[11px] text-slate-700 leading-relaxed">
-                        WhatsApp Admin: <strong class="text-[#181c28]">+62 811-0000-YYL</strong> (07.00 - 21.00 WIB).
+                        WhatsApp Admin: <strong class="text-[#0F2854]">+62 851-7999-8522</strong> (07.00 - 21.00 WIB).
                     </p>
                 </footer>
             </div>
@@ -93,7 +93,7 @@ session_start();
             if (!res.ok || !data.success) return alert(data.error || 'Nomor tidak terdaftar.');
 
             sessionStorage.setItem('yaraResetPhone', data.phone);
-            alert('SIMULASI WA OTP RESET: Kode Anda adalah ' + data.demo_otp);
+            alert('Kode OTP telah dikirim ke WhatsApp ' + data.phone);
             window.location.href = 'otp-reset-pw.php';
         });
     </script>

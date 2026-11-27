@@ -16,23 +16,23 @@
     </style>
 </head>
 
-<body class="bg-[#f4f5f7] text-[#181c28] antialiased min-h-screen flex flex-col">
-    <div class="max-w-md w-full mx-auto min-h-screen bg-[#f4f5f7] border-x border-slate-200 flex flex-col">
+<body class="bg-[#EEF4FA] text-[#0F2854] antialiased min-h-screen flex flex-col">
+    <div class="max-w-md w-full mx-auto min-h-screen bg-[#EEF4FA] border-x border-[#DCEAF7] flex flex-col">
         <main class="w-full px-4 py-8 flex-1 flex flex-col">
             <div class="my-auto flex flex-col gap-4 w-full">
                 <section data-purpose="page-header">
                     <h1 class="text-xl font-extrabold tracking-tight leading-tight uppercase mb-3">
                         VERIFIKASI OTP
                     </h1>
-                    <div class="flex items-center justify-between bg-slate-200/60 p-2 rounded border border-slate-300 text-xs">
+                    <div class="flex items-center justify-between bg-[#DCEAF7]/60 p-2 rounded border border-[#C9D9EA] text-xs">
                         <span class="text-slate-600 font-bold px-2 py-1">[1] SELESAI [v]</span>
                         <span class="text-slate-400 select-none tracking-widest">====</span>
-                        <span class="bg-[#181c28] text-white font-bold px-3 py-1.5 rounded text-[11px] whitespace-nowrap">[2] VERIFIKASI OTP</span>
+                        <span class="bg-[#0F2854] text-white font-bold px-3 py-1.5 rounded text-[11px] whitespace-nowrap">[2] VERIFIKASI OTP</span>
                     </div>
                 </section>
 
-                <section class="bg-white border border-slate-200 p-4" data-purpose="data-summary">
-                    <div class="flex items-center justify-between bg-[#eef2f9] px-2.5 py-1.5 mb-3">
+                <section class="bg-[#F8FBFF] border border-[#DCEAF7] p-4" data-purpose="data-summary">
+                    <div class="flex items-center justify-between bg-[#E2EEF9] px-2.5 py-1.5 mb-3">
                         <span class="text-[11px] font-bold tracking-tight">[SEKSI 1. DATA PENDAFTARAN]</span>
                         <span class="text-[10px] font-medium text-slate-500">[TERKUNCI]</span>
                     </div>
@@ -46,52 +46,52 @@
                             <span id="otp-reg-phone" class="font-bold text-right">-</span>
                         </div>
                     </div>
-                    <div class="mt-3 pt-2.5 border-t border-[#eef2f9] text-right">
-                        <a class="text-[11px] font-bold underline text-[#181c28] hover:text-slate-600" href="register.php">
+                    <div class="mt-3 pt-2.5 border-t border-[#E2EEF9] text-right">
+                        <a class="text-[11px] font-bold underline text-[#0F2854] hover:text-slate-600" href="register.php">
                             [UBAH DATA]
                         </a>
                     </div>
                 </section>
 
-                <section class="bg-white border border-slate-200 p-4" data-purpose="otp-verification">
-                    <div class="bg-[#eef2f9] px-2.5 py-1.5 mb-3">
+                <section class="bg-[#F8FBFF] border border-[#DCEAF7] p-4" data-purpose="otp-verification">
+                    <div class="bg-[#E2EEF9] px-2.5 py-1.5 mb-3">
                         <span class="text-[11px] font-bold tracking-tight">[SEKSI 2. INPUT KODE OTP]</span>
                     </div>
                     <p class="text-xs text-slate-700 mb-4">
-                        Masukkan 6 digit kode yang dikirim ke <strong id="otp-target-phone" class="text-[#181c28]">-</strong>.
+                        Masukkan 6 digit kode yang dikirim ke <strong id="otp-target-phone" class="text-[#0F2854]">-</strong>.
                     </p>
                     <div class="grid grid-cols-6 gap-2 mb-4" data-purpose="otp-input-group" id="otp-container">
-                        <input aria-label="Digit 1" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
-                        <input aria-label="Digit 2" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
-                        <input aria-label="Digit 3" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
-                        <input aria-label="Digit 4" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
-                        <input aria-label="Digit 5" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
-                        <input aria-label="Digit 6" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#eef2f9] border border-slate-300 rounded-none focus:border-[#181c28] focus:ring-0 focus:bg-white placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
+                        <input aria-label="Digit 1" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#E2EEF9] border border-[#C9D9EA] rounded-none focus:border-[#1C4D8D] focus:ring-0 focus:bg-[#F8FBFF] placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
+                        <input aria-label="Digit 2" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#E2EEF9] border border-[#C9D9EA] rounded-none focus:border-[#1C4D8D] focus:ring-0 focus:bg-[#F8FBFF] placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
+                        <input aria-label="Digit 3" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#E2EEF9] border border-[#C9D9EA] rounded-none focus:border-[#1C4D8D] focus:ring-0 focus:bg-[#F8FBFF] placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
+                        <input aria-label="Digit 4" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#E2EEF9] border border-[#C9D9EA] rounded-none focus:border-[#1C4D8D] focus:ring-0 focus:bg-[#F8FBFF] placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
+                        <input aria-label="Digit 5" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#E2EEF9] border border-[#C9D9EA] rounded-none focus:border-[#1C4D8D] focus:ring-0 focus:bg-[#F8FBFF] placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
+                        <input aria-label="Digit 6" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#E2EEF9] border border-[#C9D9EA] rounded-none focus:border-[#1C4D8D] focus:ring-0 focus:bg-[#F8FBFF] placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text">
                     </div>
-                    <div class="bg-[#eef2f9] px-3 py-2.5 text-center space-y-1">
-                        <div class="text-xs font-medium text-[#181c28]">
+                    <div class="bg-[#E2EEF9] px-3 py-2.5 text-center space-y-1">
+                        <div class="text-xs font-medium text-[#0F2854]">
                             Sisa waktu: <strong class="font-extrabold" id="otp-timer">05:00</strong>
                         </div>
-                        <button id="btn-resend-otp" class="text-[11px] font-bold text-slate-500 hover:text-[#181c28] underline" type="button">
+                        <button id="btn-resend-otp" class="text-[11px] font-bold text-slate-500 hover:text-[#0F2854] underline" type="button">
                             [KIRIM ULANG KODE]
                         </button>
                     </div>
                 </section>
 
                 <section class="space-y-3 mt-1" data-purpose="terms-and-submit">
-                    <label class="flex items-start gap-2.5 bg-white border border-slate-200 p-3 cursor-pointer">
-                        <input id="agree-terms" checked class="mt-0.5 w-4 h-4 rounded-none border-[#181c28] text-[#181c28] focus:ring-0" type="checkbox">
+                    <label class="flex items-start gap-2.5 bg-[#F8FBFF] border border-[#DCEAF7] p-3 cursor-pointer">
+                        <input id="agree-terms" checked class="mt-0.5 w-4 h-4 rounded-none border-[#0F2854] text-[#0F2854] focus:ring-0" type="checkbox">
                         <span class="text-[11px] leading-relaxed text-slate-700">
-                            Saya menyetujui <a class="underline font-bold text-[#181c28]" href="#">Ketentuan Layanan</a> &amp; <a class="underline font-bold text-[#181c28]" href="#">Kebijakan Privasi</a> Yara Yara Laundry.
+                            Saya menyetujui <a class="underline font-bold text-[#0F2854]" href="#">Ketentuan Layanan</a> &amp; <a class="underline font-bold text-[#0F2854]" href="#">Kebijakan Privasi</a> Yara Yara Laundry.
                         </span>
                     </label>
 
-                    <button id="btn-verify-otp" class="w-full bg-[#181c28] hover:bg-slate-800 active:bg-black text-white font-bold text-xs tracking-wider py-3.5 px-4 rounded-none transition-colors" type="button">
+                    <button id="btn-verify-otp" class="w-full bg-[#0F2854] hover:bg-[#1C4D8D] active:bg-[#0F2854] text-white font-bold text-xs tracking-wider py-3.5 px-4 rounded-none transition-colors" type="button">
                         [VERIFIKASI &amp; AKTIFKAN AKUN]
                     </button>
 
                     <div class="text-center pt-1">
-                        <a class="text-[11px] font-bold text-slate-500 hover:text-[#181c28] underline" href="login.php">
+                        <a class="text-[11px] font-bold text-slate-500 hover:text-[#0F2854] underline" href="login.php">
                             [BATALKAN]
                         </a>
                     </div>

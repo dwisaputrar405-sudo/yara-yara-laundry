@@ -15,18 +15,18 @@ session_start();
     <style data-purpose="typography-and-reset">
         body {
             font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            background-color: #f4f5f7;
-            color: #181c28;
+            background-color: #EEF4FA;
+            color: #0F2854;
             -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
 
-<body class="min-h-screen flex flex-col items-center justify-center bg-[#f4f5f7]">
-    <div class="w-full max-w-md min-h-screen bg-[#f4f5f7] border-x border-slate-200 flex flex-col">
+<body class="min-h-screen flex flex-col items-center justify-center bg-[#EEF4FA]">
+    <div class="w-full max-w-md min-h-screen bg-[#EEF4FA] border-x border-[#DCEAF7] flex flex-col">
         <main class="flex-1 p-4 py-8 flex flex-col">
             <div class="my-auto flex flex-col gap-4 w-full">
-                <section class="bg-white border-2 border-[#181c28] p-4">
+                <section class="bg-[#F8FBFF] border-2 border-[#0F2854] p-4">
                     <h1 class="text-base font-bold tracking-tight uppercase">
                         VERIFIKASI OTP PEMULIHAN
                     </h1>
@@ -35,11 +35,11 @@ session_start();
                     </p>
                 </section>
 
-                <section class="bg-white border-2 border-[#181c28] p-4 flex flex-col gap-4">
-                    <div class="bg-[#f4f5f7] border border-[#181c28] px-3 py-2 flex items-center justify-between gap-2 text-xs">
+                <section class="bg-[#F8FBFF] border-2 border-[#0F2854] p-4 flex flex-col gap-4">
+                    <div class="bg-[#EEF4FA] border border-[#0F2854] px-3 py-2 flex items-center justify-between gap-2 text-xs">
                         <div>
                             <span class="text-[10px] text-slate-500 block uppercase">TUJUAN OTP</span>
-                            <strong id="reset-target-phone" class="text-[#181c28]">-</strong>
+                            <strong id="reset-target-phone" class="text-[#0F2854]">-</strong>
                         </div>
                         <a href="reset-pw.php" class="text-[11px] font-bold uppercase underline hover:text-slate-600">
                             [UBAH]
@@ -48,45 +48,45 @@ session_start();
 
                     <form class="flex flex-col gap-4" id="otp-reset-form" method="POST">
                         <div class="grid grid-cols-6 gap-2">
-                            <input aria-label="Digit 1" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
-                            <input aria-label="Digit 2" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
-                            <input aria-label="Digit 3" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
-                            <input aria-label="Digit 4" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
-                            <input aria-label="Digit 5" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
-                            <input aria-label="Digit 6" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-white border-2 border-[#181c28] focus:bg-[#f4f5f7] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
+                            <input aria-label="Digit 1" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#F8FBFF] border-2 border-[#0F2854] focus:bg-[#EEF4FA] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
+                            <input aria-label="Digit 2" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#F8FBFF] border-2 border-[#0F2854] focus:bg-[#EEF4FA] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
+                            <input aria-label="Digit 3" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#F8FBFF] border-2 border-[#0F2854] focus:bg-[#EEF4FA] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
+                            <input aria-label="Digit 4" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#F8FBFF] border-2 border-[#0F2854] focus:bg-[#EEF4FA] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
+                            <input aria-label="Digit 5" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#F8FBFF] border-2 border-[#0F2854] focus:bg-[#EEF4FA] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
+                            <input aria-label="Digit 6" class="otp-input w-full h-12 text-center text-lg font-extrabold bg-[#F8FBFF] border-2 border-[#0F2854] focus:bg-[#EEF4FA] focus:ring-0 focus:outline-none placeholder:text-slate-400" inputmode="numeric" maxlength="1" placeholder="_" type="text" />
                         </div>
 
-                        <div class="bg-[#f4f5f7] border border-slate-300 px-3 py-2.5 text-center space-y-1">
-                            <div class="text-xs font-medium text-[#181c28]">
+                        <div class="bg-[#EEF4FA] border border-[#C9D9EA] px-3 py-2.5 text-center space-y-1">
+                            <div class="text-xs font-medium text-[#0F2854]">
                                 Sisa waktu: <strong class="font-extrabold" id="otp-timer">05:00</strong>
                             </div>
-                            <button id="btn-resend-otp" class="text-[11px] font-bold text-slate-600 hover:text-[#181c28] underline uppercase" type="button">
-                                [KIRIM ULANG KODE OTP]
+                            <button id="btn-resend-otp" disabled class="text-[11px] font-bold text-slate-400 cursor-not-allowed uppercase" type="button">
+                                [TUNGGU 60 DETIK UNTUK KIRIM ULANG]
                             </button>
                         </div>
 
                         <div class="flex flex-col gap-1.5">
                             <label class="text-xs font-bold uppercase tracking-wide" for="new-reset-password">KATA SANDI BARU [MIN. 6 KARAKTER]</label>
-                            <input id="new-reset-password" type="password" required minlength="6" placeholder="••••••••" class="w-full px-3 py-2.5 text-sm bg-white border-2 border-[#181c28] focus:ring-0 focus:outline-none" />
+                            <input id="new-reset-password" type="password" required minlength="6" placeholder="••••••••" class="w-full px-3 py-2.5 text-sm bg-[#F8FBFF] border-2 border-[#0F2854] focus:ring-0 focus:outline-none" />
                         </div>
 
-                        <button class="w-full bg-[#181c28] text-white py-3.5 px-4 text-xs font-bold uppercase tracking-wider border-2 border-[#181c28] hover:bg-slate-800 active:translate-y-0.5 transition-transform" type="submit">
+                        <button class="w-full bg-[#0F2854] text-white py-3.5 px-4 text-xs font-bold uppercase tracking-wider border-2 border-[#0F2854] hover:bg-[#1C4D8D] active:translate-y-0.5 transition-transform" type="submit">
                             [VERIFIKASI &amp; ATUR SANDI BARU -&gt;]
                         </button>
 
-                        <a href="login.php" class="w-full bg-white text-[#181c28] py-3 px-4 text-xs font-bold uppercase tracking-wide border-2 border-dashed border-[#181c28] text-center hover:bg-slate-50">
+                        <a href="login.php" class="w-full bg-[#F8FBFF] text-[#0F2854] py-3 px-4 text-xs font-bold uppercase tracking-wide border-2 border-dashed border-[#0F2854] text-center hover:bg-[#F5F9FE]">
                             [BATALKAN / KEMBALI KE LOGIN]
                         </a>
                     </form>
                 </section>
 
-                <footer class="bg-white border-2 border-[#181c28] p-3.5 text-xs">
+                <footer class="bg-[#F8FBFF] border-2 border-[#0F2854] p-3.5 text-xs">
                     <div class="flex items-center gap-1.5 font-bold uppercase mb-1">
                         <span class="text-red-700">[!]</span>
                         <span>BANTUAN TEKNIS</span>
                     </div>
                     <p class="text-[11px] text-slate-700 leading-relaxed">
-                        WhatsApp Admin: <strong class="text-[#181c28]">+62 811-0000-YYL</strong> (07.00 - 21.00 WIB). Jangan bagikan kode OTP kepada siapa pun.
+                        WhatsApp Admin: <strong class="text-[#0F2854]">+62 851-7999-8522</strong> (07.00 - 21.00 WIB). Jangan bagikan kode OTP kepada siapa pun.
                     </p>
                 </footer>
             </div>
@@ -109,6 +109,7 @@ session_start();
             });
         });
 
+        // Timer masa berlaku OTP (5 menit)
         let remaining = 300;
         const timerEl = document.getElementById('otp-timer');
         setInterval(() => {
@@ -118,16 +119,72 @@ session_start();
             }
         }, 1000);
 
-        document.getElementById('btn-resend-otp').addEventListener('click', async () => {
-            const res = await fetch('../api/user.php?route=auth&action=request_otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone: savedPhone, purpose: 'RESET_PASSWORD' })
-            });
-            const data = await res.json();
-            if (!res.ok) return alert(data.error || 'Gagal kirim ulang.');
-            remaining = 300;
-            alert('SIMULASI WA OTP BARU: ' + data.demo_otp);
+        // Anti-Spam Cooldown 60 detik untuk tombol Kirim Ulang OTP
+        const resendBtn = document.getElementById('btn-resend-otp');
+        const COOLDOWN_SECONDS = 60;
+        const STORAGE_KEY = 'yaraOtpNextResendAt';
+        let isSending = false;
+
+        function startResendCooldown(seconds) {
+            const nextAllowed = Date.now() + seconds * 1000;
+            sessionStorage.setItem(STORAGE_KEY, String(nextAllowed));
+            updateResendButton();
+        }
+
+        function updateResendButton() {
+            if (isSending) return;
+            const nextAllowed = Number(sessionStorage.getItem(STORAGE_KEY) || 0);
+            const diff = Math.ceil((nextAllowed - Date.now()) / 1000);
+
+            if (diff > 0) {
+                resendBtn.disabled = true;
+                resendBtn.className = 'text-[11px] font-bold text-slate-400 cursor-not-allowed uppercase';
+                resendBtn.textContent = `[KIRIM ULANG DALAM ${diff} DETIK]`;
+            } else {
+                resendBtn.disabled = false;
+                resendBtn.className = 'text-[11px] font-bold text-slate-700 hover:text-[#0F2854] underline uppercase cursor-pointer';
+                resendBtn.textContent = '[KIRIM ULANG KODE OTP]';
+            }
+        }
+
+        // Aktifkan cooldown 60 detik sejak halaman pertama kali dibuka (OTP baru saja dikirim dari reset-pw.php)
+        if (!sessionStorage.getItem(STORAGE_KEY)) {
+            startResendCooldown(COOLDOWN_SECONDS);
+        } else {
+            updateResendButton();
+        }
+        setInterval(updateResendButton, 1000);
+
+        resendBtn.addEventListener('click', async () => {
+            if (resendBtn.disabled || isSending) return;
+            if (!savedPhone) return alert('Nomor tujuan tidak ditemukan. Silakan kembali ke halaman sebelumnya.');
+
+            isSending = true;
+            resendBtn.disabled = true;
+            resendBtn.className = 'text-[11px] font-bold text-slate-400 cursor-not-allowed uppercase';
+            resendBtn.textContent = '[MENGIRIM OTP...]';
+
+            try {
+                const res = await fetch('../api/user.php?route=auth&action=request_otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: savedPhone, purpose: 'RESET_PASSWORD' })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    isSending = false;
+                    startResendCooldown(15);
+                    return alert(data.error || 'Gagal kirim ulang.');
+                }
+                remaining = 300;
+                isSending = false;
+                startResendCooldown(COOLDOWN_SECONDS);
+                alert('Kode OTP baru telah dikirim ke WhatsApp Anda.');
+            } catch {
+                isSending = false;
+                startResendCooldown(15);
+                alert('Gagal terhubung ke server.');
+            }
         });
 
         document.getElementById('otp-reset-form').addEventListener('submit', async (e) => {
@@ -145,6 +202,7 @@ session_start();
             if (!res.ok || !data.success) return alert(data.error || 'Gagal mengatur ulang sandi.');
 
             sessionStorage.removeItem('yaraResetPhone');
+            sessionStorage.removeItem(STORAGE_KEY);
             alert('Kata sandi berhasil diperbarui! Silakan login dengan sandi baru.');
             window.location.href = 'login.php';
         });
