@@ -148,13 +148,23 @@ try {
         if ($action === 'summary') {
             $stats = $pdo->query("
                 SELECT
-                    COUNT(CASE WHEN status_step < 7 THEN 1 END) AS active_total,
-                    COUNT(CASE WHEN status_step IN (0, 1) THEN 1 END) AS need_weighing,
-                    COUNT(CASE WHEN status_step IN (2, 3, 4, 5) THEN 1 END) AS in_process,
-                    COUNT(CASE WHEN status_step = 3 THEN 1 END) AS washing_only,
-                    COUNT(CASE WHEN status_step = 6 THEN 1 END) AS ready_pickup,
-                    COUNT(CASE WHEN delivery_type = 'ANTAR_JEMPUT' AND status_step < 7 THEN 1 END) AS antar_jemput_total
-                FROM orders
+                    COUNT(CASE WHEN o.status_step < 7 THEN 1 END) AS active_total,
+                    COUNT(CASE WHEN o.status_step IN (0, 1) THEN 1 END) AS need_weighing,
+                    COUNT(CASE WHEN o.status_step IN (2, 3, 4, 5) THEN 1 END) AS in_process,
+                    COUNT(CASE WHEN o.status_step = 3 THEN 1 END) AS washing_only,
+                    COUNT(CASE WHEN o.status_step = 6 THEN 1 END) AS ready_pickup,
+                    COUNT(CASE WHEN o.status_step = 7 THEN 1 END) AS done_total,
+                    COUNT(CASE WHEN o.delivery_type = 'ANTAR_JEMPUT' AND o.status_step < 7 THEN 1 END) AS antar_jemput_total,
+                    COALESCE(SUM(CASE WHEN o.payment_status = 'LUNAS' AND DATE(COALESCE(o.updated_at, o.created_at)) = CURDATE() THEN o.total_price ELSE 0 END), 0) AS rev_today,
+                    COALESCE(SUM(CASE WHEN o.payment_status = 'LUNAS' AND LOWER(COALESCE(o.payment_method, '')) = 'tunai' AND DATE(COALESCE(o.updated_at, o.created_at)) = CURDATE() THEN o.total_price ELSE 0 END), 0) AS rev_today_cash,
+                    COALESCE(SUM(CASE WHEN o.payment_status = 'LUNAS' AND LOWER(COALESCE(o.payment_method, '')) <> 'tunai' AND DATE(COALESCE(o.updated_at, o.created_at)) = CURDATE() THEN o.total_price ELSE 0 END), 0) AS rev_today_noncash,
+                    COALESCE(SUM(CASE WHEN o.payment_status = 'LUNAS' AND YEAR(COALESCE(o.updated_at, o.created_at)) = YEAR(CURDATE()) AND MONTH(COALESCE(o.updated_at, o.created_at)) = MONTH(CURDATE()) THEN o.total_price ELSE 0 END), 0) AS rev_month,
+                    COALESCE(SUM(CASE WHEN o.payment_status <> 'LUNAS' AND o.status_step < 7 THEN o.total_price ELSE 0 END), 0) AS unpaid_total,
+                    COALESCE(SUM(CASE WHEN UPPER(s.unit) = 'KG' AND YEAR(o.created_at) = YEAR(CURDATE()) AND MONTH(o.created_at) = MONTH(CURDATE()) THEN o.weight ELSE 0 END), 0) AS vol_kg_month,
+                    COALESCE(SUM(CASE WHEN UPPER(s.unit) <> 'KG' AND YEAR(o.created_at) = YEAR(CURDATE()) AND MONTH(o.created_at) = MONTH(CURDATE()) THEN o.weight ELSE 0 END), 0) AS vol_pcs_month,
+                    COALESCE(AVG(CASE WHEN o.status_step = 7 AND o.updated_at IS NOT NULL THEN TIMESTAMPDIFF(MINUTE, o.created_at, o.updated_at) END), 0) AS avg_done_minutes
+                FROM orders o
+                JOIN services s ON o.service_id = s.id
             ")->fetch();
 
             $overdue = $pdo->query("
@@ -197,6 +207,7 @@ try {
             'ANTAR_JEMPUT' => "o.delivery_type = 'ANTAR_JEMPUT' AND o.status_step < 7",
             'DICUCI'       => 'o.status_step = 3',
             'SIAP'         => 'o.status_step = 6',
+            'SELESAI'      => 'o.status_step = 7',
             'OVERDUE'      => 'o.is_overdue = 1 AND o.status_step < 7',
         ];
         $where  = [$filterMap[$filter] ?? 'o.status_step < 7'];
@@ -215,12 +226,14 @@ try {
         $safePage   = min($page, $totalPages);
         $offset     = ($safePage - 1) * $limit;
 
+        $orderDir = ($filter === 'SELESAI') ? 'DESC' : 'ASC';
+
         $dataStmt = $pdo->prepare("
             SELECT o.*, c.name AS customer_name, c.phone AS customer_phone, s.name AS service_name, s.unit AS service_unit, s.price_per_unit
             FROM orders o
             JOIN customers c ON o.customer_id = c.id
             JOIN services s ON o.service_id = s.id
-            $whereSql ORDER BY o.id ASC LIMIT $limit OFFSET $offset
+            $whereSql ORDER BY o.id $orderDir LIMIT $limit OFFSET $offset
         ");
         $dataStmt->execute($params);
 
@@ -263,7 +276,10 @@ try {
         $payStatus = ($in['payment_status'] ?? 'BELUM') === 'LUNAS' ? 'LUNAS' : 'BELUM';
         $payMethod = $payStatus === 'LUNAS' ? ($in['payment_method'] ?? 'Tunai') : null;
         $fee       = $delType === 'ANTAR_JEMPUT' ? getDeliveryFee($pdo) : 0;
-        $total     = (int)round($weight * $service['price_per_unit']) + $fee;
+
+        $minTotal  = (int)round($weight * $service['price_per_unit']) + $fee;
+        $inputTot  = isset($in['total_price']) ? (int)round((float)$in['total_price']) : 0;
+        $total     = ($service['unit'] !== 'Kg' && $inputTot >= $minTotal) ? $inputTot : $minTotal;
 
         $pdo->beginTransaction();
         $custId    = upsertCustomer($pdo, $name, $phone, $address);
@@ -287,6 +303,9 @@ try {
         $stmt->execute([$id]);
         $cur = $stmt->fetch();
         if (!$cur) jsonOut(['error' => 'Tiket tidak ditemukan.'], 404);
+        if ((int)$cur['status_step'] === 7) {
+            jsonOut(['error' => 'Transaksi yang sudah selesai [7/7] terkunci dan tidak dapat diubah lagi.'], 403);
+        }
 
         $in      = jsonIn();
         $delType = isset($in['delivery_type']) ? ($in['delivery_type'] === 'ANTAR_JEMPUT' ? 'ANTAR_JEMPUT' : 'DROP_OFF') : $cur['delivery_type'];
@@ -338,6 +357,14 @@ try {
     }
 
     if ($method === 'DELETE' && $id > 0) {
+        $chk = $pdo->prepare("SELECT status_step FROM orders WHERE id = ?");
+        $chk->execute([$id]);
+        $row = $chk->fetch();
+        if (!$row) jsonOut(['error' => 'Tiket tidak ditemukan.'], 404);
+        if ((int)$row['status_step'] === 7) {
+            jsonOut(['error' => 'Transaksi yang sudah selesai [7/7] terkunci dan tidak dapat dihapus.'], 403);
+        }
+
         $pdo->prepare("DELETE FROM orders WHERE id = ?")->execute([$id]);
         jsonOut(['deleted' => true]);
     }
